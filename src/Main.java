@@ -1,7 +1,7 @@
-import taskManager.model.Task;
-import taskManager.model.SubTask;
-import taskManager.model.StateTask;
 import taskManager.model.Epic;
+import taskManager.model.StateTask;
+import taskManager.model.SubTask;
+import taskManager.model.Task;
 import taskManager.service.TaskManager;
 
 public class Main {
@@ -23,33 +23,33 @@ public class Main {
         taskManager.addSubTask(subTask1);
         taskManager.addSubTask(subTask2);
         System.out.println("Все созданные списки: ");
+        System.out.println(taskManager.getAllTasks());
         System.out.println(taskManager.getAllSubtasks());
         System.out.println(taskManager.getAllEpics());
-        System.out.println(taskManager.getAllSubtasks());
 
         System.out.println("Меняем статусы: ");
 
         Task task2 = new Task(0,"Первая задача", "Описание1", StateTask.IN_PROGRESS);
         Task task3 = new Task(1,"Вторая задача", "Описание125", StateTask.DONE);
         SubTask subTask3 = new SubTask("Первая подзадача", "Описание подзадачи", StateTask.IN_PROGRESS, 2, 3);
-        SubTask subTask4 = new SubTask("ервая подзадача эпика 2", "Описание подзадачи", StateTask.DONE, 4, 5);
-        SubTask subTask5 = new SubTask("ервая подзадача эпика 2", "Описание подзадачи", StateTask.DONE, 4, 6);
+        SubTask subTask4 = new SubTask("Первая подзадача эпика 2", "Описание подзадачи", StateTask.DONE, 4, 5);
+        SubTask subTask5 = new SubTask("Первая подзадача эпика 2", "Описание подзадачи", StateTask.DONE, 4, 6);
         taskManager.updateTask(task2);
         taskManager.updateTask(task3);
         taskManager.updateSubTask(subTask3);
         taskManager.updateSubTask(subTask4);
         taskManager.updateSubTask(subTask5);
+        System.out.println(taskManager.getAllTasks());
         System.out.println(taskManager.getAllSubtasks());
         System.out.println(taskManager.getAllEpics());
-        System.out.println(taskManager.getAllSubtasks());
 
         System.out.println("Удаляем Таски: ");
 
         taskManager.deleteTask(1);
         taskManager.deleteSubTask(6);
         taskManager.deleteEpic(2);
+        System.out.println(taskManager.getAllTasks());
         System.out.println(taskManager.getAllSubtasks());
         System.out.println(taskManager.getAllEpics());
-        System.out.println(taskManager.getAllSubtasks());
     }
 }

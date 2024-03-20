@@ -1,4 +1,5 @@
 package taskManager.model;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -25,7 +26,7 @@ public class Epic extends Task {
         subTasksInEpic.clear();
     }
 
-    /*@Override
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -43,6 +44,6 @@ public class Epic extends Task {
     public String toString() {
         return "Epic{" +
                 "subTasksInEpic=" + subTasksInEpic +
-                '}';
-    }*/
+                "} " + super.toString();
+    }
 }

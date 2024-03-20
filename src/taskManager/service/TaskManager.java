@@ -1,30 +1,19 @@
 package taskManager.service;
-import taskManager.model.Task;
-import taskManager.model.SubTask;
-import taskManager.model.StateTask;
+
 import taskManager.model.Epic;
-import java.util.HashMap;
+import taskManager.model.SubTask;
+import taskManager.model.Task;
+import taskManager.model.StateTask;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TaskManager {
 
+    private int id = 0;
     private HashMap<Integer, Task> tasks = new HashMap<>();
     private HashMap<Integer, SubTask> subTasks = new HashMap<>();
     private HashMap<Integer, Epic> epics = new HashMap<>();
-
-    public HashMap<Integer, Task> getTasks() {
-        return tasks;
-    }
-
-    public HashMap<Integer, SubTask> getSubTasks() {
-        return subTasks;
-    }
-
-    public HashMap<Integer, Epic> getEpics() {
-        return epics;
-    }
-
-    private int id = 0;
 
     private int generateNewId() {
         return id++;
@@ -178,18 +167,10 @@ public class TaskManager {
     }
 
     public ArrayList<Epic> getAllEpics() {
-        ArrayList<Epic> allEpics = new ArrayList<>();
-        for (Epic epic : epics.values()) {
-            allEpics.add(epics.get(epic.getId()));
-        }
-        return allEpics;
+        return new ArrayList<>(epics.values());
     }
 
     public ArrayList<SubTask> getAllSubtasks() {
-        ArrayList<SubTask> allSubtasks = new ArrayList<>();
-        for (SubTask subtask : subTasks.values()) {
-            allSubtasks.add(subTasks.get(subtask.getId()));
-        }
-        return allSubtasks;
+        return new ArrayList<>(subTasks.values());
     }
 }

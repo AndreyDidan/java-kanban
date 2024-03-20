@@ -1,4 +1,5 @@
 package taskManager.model;
+
 import java.util.Objects;
 
 public class SubTask extends Task {
@@ -18,7 +19,7 @@ public class SubTask extends Task {
         return idEpic;
     }
 
-    /*@Override
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -36,6 +37,6 @@ public class SubTask extends Task {
     public String toString() {
         return "SubTask{" +
                 "idEpic=" + idEpic +
-                '}';
-    }*/
+                "} " + super.toString();
+    }
 }
