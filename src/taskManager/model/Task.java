@@ -15,10 +15,10 @@ public class Task {
         this.stateTask = stateTask;
     }
 
-    public Task(String name, String description, StateTask stateTask) {
+    public Task(String name, String description) {
         this.name = name;
         this.description = description;
-        this.stateTask = stateTask.NEW;
+        stateTask = StateTask.NEW;
     }
 
     public int getId() {

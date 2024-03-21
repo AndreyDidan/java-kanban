@@ -8,18 +8,18 @@ public class Main {
 
     public static void main(String[] args) {
         TaskManager taskManager = new TaskManager();
-        Task task = new Task("Первая задача", "Описание1", StateTask.NEW);
+        Task task = new Task("Первая задача", "Описание1");
         taskManager.addTask(task);
-        Task task1 = new Task("Вторая задача", "Описание2", StateTask.NEW);
+        Task task1 = new Task("Вторая задача", "Описание2");
         taskManager.addTask(task1);
         Epic epic = new Epic("Первый эпик", "Описание эпика1");
         taskManager.addEpic(epic);
-        SubTask subTask = new SubTask("Первая подзадача", "Описание подзадачи", StateTask.NEW, 2);
+        SubTask subTask = new SubTask("Первая подзадача", "Описание подзадачи", 2);
         taskManager.addSubTask(subTask);
         Epic epic1 = new Epic("Второй эпик", "Описание эпика2");
         taskManager.addEpic(epic1);
-        SubTask subTask1 = new SubTask("Первая подзадача эпика 2", "Описание подзадачи", StateTask.NEW, 4);
-        SubTask subTask2 = new SubTask("Вторая подзадача эпика 2", "Описание подзадачи", StateTask.NEW, 4);
+        SubTask subTask1 = new SubTask("Первая подзадача эпика 2", "Описание подзадачи", 4);
+        SubTask subTask2 = new SubTask("Вторая подзадача эпика 2", "Описание подзадачи", 4);
         taskManager.addSubTask(subTask1);
         taskManager.addSubTask(subTask2);
         System.out.println("Все созданные списки: ");
