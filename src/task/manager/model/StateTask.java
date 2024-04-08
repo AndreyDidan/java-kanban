@@ -1,4 +1,4 @@
-package taskManager.model;
+package task.manager.model;
 
 public enum StateTask {
     NEW,
