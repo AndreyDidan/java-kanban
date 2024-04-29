@@ -1,11 +1,11 @@
-package taskManager.model;
+package task.manager.model;
 
 import java.util.Objects;
 
 public class SubTask extends Task {
     private int idEpic;
 
-    public SubTask(String name, String description, int idEpic){
+    public SubTask(String name, String description, int idEpic) {
         super(name, description);
         this.idEpic = idEpic;
     }

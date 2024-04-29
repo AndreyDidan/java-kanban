@@ -1,4 +1,4 @@
-package taskManager.model;
+package task.manager.model;
 
 import java.util.Objects;
 
@@ -58,7 +58,7 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return id == task.id && Objects.equals(name, task.name) && Objects.equals(description, task.description) && Objects.equals(stateTask, task.stateTask);
+        return id == task.id && Objects.equals(name, task.name) && Objects.equals(description, task.description) && stateTask == task.stateTask;
     }
 
     @Override
@@ -72,7 +72,7 @@ public class Task {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", stateTask='" + stateTask + '\'' +
+                ", stateTask=" + stateTask +
                 '}';
     }
 }
