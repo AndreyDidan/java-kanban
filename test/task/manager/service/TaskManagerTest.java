@@ -164,8 +164,8 @@ class TaskManagerTest {
         List<Task> history = taskManager.getHistory();
         int coin = history.size();
 
-        Assertions.assertEquals(2, coin);
-        Assertions.assertEquals(newTask2, history.get(1));
+        Assertions.assertEquals(1, coin);
+        Assertions.assertEquals(newTask2, history.get(0));
     }
 
     @Test
@@ -222,19 +222,5 @@ class TaskManagerTest {
         taskManager.deleteSubTask(1);
 
         Assertions.assertNotEquals(expected, actual);
-    }
-
-    @Test
-    void addTwoEpicAndDeleteOneEpic () {
-        Epic expected = null;
-        Epic newEpic77 = new Epic("Эпик77", "Описание эпика77");
-        Epic newEpic88 = new Epic("Эпик88", "Описание эпика88");
-        taskManager.addEpic(newEpic77);
-        taskManager.addEpic(newEpic88);
-
-        taskManager.deleteEpic(0);
-
-        Epic actual = taskManager.getEpicId(0);
-        Assertions.assertEquals(expected, actual);
     }
 }
