@@ -32,22 +32,22 @@ public class Main {
         SubTask newSubTask3 = new SubTask("Подзадача 3", "Описание подзадачи 3", 4);
         taskManager.addSubTask(newSubTask3);
 
-        /*taskManager.getTaskId(0);
+        taskManager.getTaskId(0);
         taskManager.getTaskId(1);
         taskManager.getTaskId(2);
-        taskManager.getTaskId(1);*/
-        /*taskManager.getEpicId(3);
+        taskManager.getTaskId(1);
+        taskManager.getEpicId(3);
         taskManager.getEpicId(4);
-        taskManager.getEpicId(5);*/
+        taskManager.getEpicId(5);
         taskManager.getSubTaskId(6);
         taskManager.getSubTaskId(7);
         taskManager.getSubTaskId(8);
         taskManager.getSubTaskId(6);
 
-        //.deleteAllSubTask();
-        //taskManager.deleteAllEpics();
-        //taskManager.deleteAllTasks();
-        taskManager.deleteSubTask(7);
+        taskManager.deleteAllSubTask();
+        taskManager.deleteAllEpics();
+        taskManager.deleteAllTasks();
+        //taskManager.deleteSubTask(7);
 
 
         List<Task> history = taskManager.getHistory();
