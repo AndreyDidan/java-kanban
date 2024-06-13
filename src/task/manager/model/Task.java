@@ -21,7 +21,7 @@ public class Task {
         stateTask = StateTask.NEW;
     }
 
-    public Integer getIdEpic(){
+    public Integer getIdEpic() {
         return null;
     }
 
