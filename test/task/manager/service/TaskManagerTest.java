@@ -218,9 +218,65 @@ class TaskManagerTest {
         SubTask newSubTask12 = new SubTask("Подзадача 112", "Описание112", 0);
         taskManager.addSubTask(newSubTask12);
 
-        SubTask actual = taskManager.getSubTaskId(1);
         taskManager.deleteSubTask(1);
+        SubTask actual = taskManager.getSubTaskId(1);
 
         Assertions.assertNotEquals(expected, actual);
+    }
+
+    @Test
+    void addTaskAndRemoveAllTaskInHistoryManager(){
+
+        Task newTask = new Task("Задача6", "Описание6");
+        taskManager.addTask(newTask);
+        taskManager.getTaskId(0);
+        Task newTask2 = new Task(0, "Задача 7", "Описание15", StateTask.IN_PROGRESS);
+        taskManager.addTask(newTask2);
+        taskManager.getTaskId(1);
+
+        taskManager.deleteAllTasks();
+        List<Task> history = taskManager.getHistory();
+        int coin = 0;
+
+        Assertions.assertEquals(coin, history.size());
+    }
+
+    @Test
+    void addEpicAndRemoveAllEpicInHistoryManager(){
+
+        Epic newEpic = new Epic("Эпик2", "Описание эпика2");
+        taskManager.addEpic(newEpic);
+        taskManager.getEpicId(0);
+        Epic newEpic2 = new Epic("Эпик 3", "Описание эпика 3");
+        taskManager.addEpic(newEpic2);
+        taskManager.getEpicId(1);
+        SubTask newSubTask1 = new SubTask("Подзадача 0", "Описание подзадачи 0", 0);
+        taskManager.addSubTask(newSubTask1);
+        taskManager.getSubTaskId(2);
+
+        taskManager.deleteAllEpics();
+        List<Task> history = taskManager.getHistory();
+        int coin = 0;
+
+        Assertions.assertEquals(coin, history.size());
+    }
+
+    @Test
+    void addSubTaskAndRemoveAllEpicInHistoryManager(){
+
+        Epic newEpic = new Epic("Эпик", "Описание эпика");
+        taskManager.addEpic(newEpic);
+        SubTask newSubTask = new SubTask("Подзадача 01", "Описание подзадачи 01", 0);
+        taskManager.addSubTask(newSubTask);
+        taskManager.getSubTaskId(1);
+        SubTask newSubTask1 = new SubTask("Подзадача 02", "Описание подзадачи 02", 0);
+        taskManager.addSubTask(newSubTask1);
+        taskManager.getSubTaskId(2);
+
+        taskManager.deleteAllSubTask();
+        List<Task> history = taskManager.getHistory();
+        int coin = 0;
+
+        Assertions.assertEquals(coin, history.size());
     }
 }
