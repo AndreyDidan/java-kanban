@@ -21,6 +21,10 @@ public class Task {
         stateTask = StateTask.NEW;
     }
 
+    public Integer getIdEpic(){
+        return null;
+    }
+
     public int getId() {
         return id;
     }
@@ -51,6 +55,10 @@ public class Task {
 
     public void setStateTask(StateTask stateTask) {
         this.stateTask = stateTask;
+    }
+
+    public TaskType getType() {
+        return TaskType.TASK;
     }
 
     @Override
