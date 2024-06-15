@@ -94,11 +94,14 @@ class FileBackedTaskManagerTest {
         fileBackedTaskManager.addEpic(epic);
         SubTask subTask = new SubTask("Сабтаска3", "Описание3", epic.getId());
         fileBackedTaskManager.addSubTask(subTask);
+        Task task1 = new Task("Таска1", "Описание1");
+        fileBackedTaskManager.addTask(task1);
 
         FileBackedTaskManager fileBackedTaskManager1 = FileBackedTaskManager.loadFromFile(file);
 
         assertEquals(fileBackedTaskManager.getTaskId(1), fileBackedTaskManager1.getTaskId(1));
         assertEquals(fileBackedTaskManager.getEpicId(2), fileBackedTaskManager1.getEpicId(2));
         assertEquals(fileBackedTaskManager.getSubTaskId(3), fileBackedTaskManager1.getSubTaskId(3));
+        assertEquals(fileBackedTaskManager.getAllTasks(), fileBackedTaskManager1.getAllTasks());
     }
 }
