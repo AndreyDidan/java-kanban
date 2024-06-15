@@ -1,12 +1,7 @@
 package task.manager.model;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import task.manager.service.Managers;
-import task.manager.service.TaskManager;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class EpicTest {
 

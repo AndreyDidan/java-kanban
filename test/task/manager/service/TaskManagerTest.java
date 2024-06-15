@@ -23,12 +23,12 @@ class TaskManagerTest {
     @Test
     void addTaskAndGenerateId() {
 
-        Task expected = new Task(0, "Задача 1", "Описание", StateTask.NEW);
+        Task expected = new Task(1, "Задача 1", "Описание", StateTask.NEW);
         Task newTask = new Task("Задача 1", "Описание");
 
         taskManager.addTask(newTask);
 
-        Task actual = taskManager.getTaskId(0);
+        Task actual = taskManager.getTaskId(1);
         Assertions.assertEquals(expected, actual);
     }
 
@@ -36,24 +36,24 @@ class TaskManagerTest {
     void addSubTaskAndGenerateId() {
 
         Epic newEpic = new Epic("Эпик1", "Описание эпика");
-        SubTask expected = new SubTask("Задача 2", "Описание", StateTask.NEW, 0, 1);
-        SubTask newSubTask = new SubTask("Задача 2", "Описание", 0);
+        SubTask expected = new SubTask("Задача 2", "Описание", StateTask.NEW, 1, 2);
+        SubTask newSubTask = new SubTask("Задача 2", "Описание", 1);
 
         taskManager.addEpic(newEpic);
         taskManager.addSubTask(newSubTask);
 
-        SubTask actual = taskManager.getSubTaskId(1);
+        SubTask actual = taskManager.getSubTaskId(2);
         Assertions.assertEquals(expected, actual);
     }
 
     @Test
     void getTask_shouldReturnTask() {
 
-        Task expected = new Task(0, "Задача 4", "Описание4", StateTask.NEW);
+        Task expected = new Task(1, "Задача 4", "Описание4", StateTask.NEW);
         Task newTask = new Task("Задача 4", "Описание4");
         taskManager.addTask(newTask);
 
-        Task actual = taskManager.getTaskId(0);
+        Task actual = taskManager.getTaskId(1);
 
         Assertions.assertEquals(expected, actual);
     }
@@ -62,12 +62,12 @@ class TaskManagerTest {
     void getSubTask_shouldReturnSubTask() {
 
         Epic newEpic = new Epic("Эпик22", "Описание эпика2");
-        SubTask expected = new SubTask("Задача 33", "Описание33", StateTask.NEW, 0, 1);
-        SubTask newSubTask = new SubTask("Задача 33", "Описание33", 0);
+        SubTask expected = new SubTask("Задача 33", "Описание33", StateTask.NEW, 1, 2);
+        SubTask newSubTask = new SubTask("Задача 33", "Описание33", 1);
         taskManager.addEpic(newEpic);
         taskManager.addSubTask(newSubTask);
 
-        SubTask actual = taskManager.getSubTaskId(1);
+        SubTask actual = taskManager.getSubTaskId(2);
 
         Assertions.assertEquals(expected, actual);
     }
@@ -76,7 +76,6 @@ class TaskManagerTest {
     void getEpic_shouldReturnEpic() {
 
         Epic newEpic = new Epic("Эпик44", "Описание эпика44");
-        Epic expected1 = new Epic("Эпик44", "Описание эпика44");
         taskManager.addEpic(newEpic);
         Epic newEpic2 = new Epic("Эпик55", "Описание эпика55");
         taskManager.addEpic(newEpic2);
@@ -84,41 +83,41 @@ class TaskManagerTest {
         taskManager.addSubTask(newSubTask);
 
 
-        Epic actual1 = taskManager.getEpicId(0);
-        Epic actual2 = taskManager.getEpicId(1);
+        Epic actual1 = taskManager.getEpicId(1);
+        Epic actual2 = taskManager.getEpicId(2);
 
-        Assertions.assertEquals(expected1, actual1);
+        Assertions.assertEquals(newEpic, actual1);
         Assertions.assertEquals(newEpic2, actual2);
     }
 
     @Test
     void getTaskId_shouldSaveToHistory() {
 
-        Task expected = new Task(1, "Задача 31", "Описание31", StateTask.NEW);
+        Task expected = new Task(2, "Задача 31", "Описание31", StateTask.NEW);
         Task newTask = new Task("Задача 3", "Описание3");
         Task newTask1 = new Task("Задача 31", "Описание31");
         taskManager.addTask(newTask);
         taskManager.addTask(newTask1);
 
-        taskManager.getTaskId(0);
         taskManager.getTaskId(1);
+        taskManager.getTaskId(2);
         List<Task> history = taskManager.getHistory();
 
         Assertions.assertEquals(2, history.size());
-        Assertions.assertEquals(expected, history.get(1));
+        Assertions.assertEquals(newTask1, history.get(1));
     }
 
     @Test
     void getSubTaskId_shouldSaveToHistory() {
 
         Epic newEpic = new Epic("Эпик22", "Описание эпика2");
-        SubTask expected = new SubTask("Задача 33", "Описание33", StateTask.NEW, 0, 1);
-        SubTask newSubTask = new SubTask("Задача 33", "Описание33", 0);
+        SubTask expected = new SubTask("Задача 33", "Описание33", StateTask.NEW, 1, 2);
+        SubTask newSubTask = new SubTask("Задача 33", "Описание33", 1);
         taskManager.addEpic(newEpic);
         taskManager.addSubTask(newSubTask);
 
-        taskManager.getEpicId(0);
-        taskManager.getSubTaskId(1);
+        taskManager.getEpicId(1);
+        taskManager.getSubTaskId(2);
         List<Task> history = taskManager.getHistory();
 
         Assertions.assertEquals(2, history.size());
@@ -129,10 +128,10 @@ class TaskManagerTest {
     void addTaskAndUpdadeTask() {
         Task task1 = new Task("Задача 5", "Описание5");
         taskManager.addTask(task1);
-        Task task2 = new Task(0, "Задача 5", "Описание5", StateTask.IN_PROGRESS);
+        Task task2 = new Task(1, "Задача 5", "Описание5", StateTask.IN_PROGRESS);
         taskManager.updateTask(task2);
 
-        Task expected = taskManager.getTaskId(0);
+        Task expected = taskManager.getTaskId(1);
 
         Assertions.assertEquals(expected, task2);
     }
@@ -141,12 +140,12 @@ class TaskManagerTest {
     void addSubTaskAndUpdateSubTask(){
         Epic epic1 = new Epic("Первый эпик", "Описание эпика1");
         taskManager.addEpic(epic1);
-        SubTask subTask1 = new SubTask("Первая подзадача эпика", "Описание подзадачи", 0);
+        SubTask subTask1 = new SubTask("Первая подзадача эпика", "Описание подзадачи", 1);
         taskManager.addSubTask(subTask1);
-        SubTask subTask3 = new SubTask("Первая подзадача", "Описание подзадачи", StateTask.IN_PROGRESS, 0, 1);
+        SubTask subTask3 = new SubTask("Первая подзадача", "Описание подзадачи", StateTask.IN_PROGRESS, 1, 2);
         taskManager.updateSubTask(subTask3);
 
-        SubTask expected = taskManager.getSubTaskId(1);
+        SubTask expected = taskManager.getSubTaskId(2);
 
         Assertions.assertEquals(expected, subTask3);
     }
@@ -156,10 +155,10 @@ class TaskManagerTest {
 
         Task newTask = new Task("Задача6", "Описание6");
         taskManager.addTask(newTask);
-        taskManager.getTaskId(0);
-        Task newTask2 = new Task(0, "Задача 7", "Описание15", StateTask.IN_PROGRESS);
+        taskManager.getTaskId(1);
+        Task newTask2 = new Task(1, "Задача 7", "Описание15", StateTask.IN_PROGRESS);
         taskManager.updateTask(newTask2);
-        taskManager.getTaskId(0);
+        taskManager.getTaskId(1);
 
         List<Task> history = taskManager.getHistory();
         int coin = history.size();
@@ -174,7 +173,7 @@ class TaskManagerTest {
         Epic epic = new Epic("Задача 8", "Описание8");
         taskManager.addEpic(epic);
 
-        Epic actual = taskManager.getEpicId(0);
+        Epic actual = taskManager.getEpicId(1);
 
         Assertions.assertNotNull(actual);
     }
@@ -183,14 +182,14 @@ class TaskManagerTest {
     void addSubTaskInSubTask() {
 
         Epic newEpic = new Epic("Эпик3", "Описание эпика");
-        SubTask subTask1 = new SubTask("Подзадача3", "Описание3", StateTask.NEW, 0, 1);
-        SubTask subTask2 = new SubTask("Подзадача 4", "Описание4", 1);
+        SubTask subTask1 = new SubTask("Подзадача3", "Описание3", StateTask.NEW, 1, 2);
+        SubTask subTask2 = new SubTask("Подзадача 4", "Описание4", 2);
 
         taskManager.addEpic(newEpic);
         taskManager.addSubTask(subTask1);
         taskManager.addSubTask(subTask2);
 
-        SubTask actual = taskManager.getSubTaskId(1);
+        SubTask actual = taskManager.getSubTaskId(2);
         Assertions.assertEquals(subTask1, actual);
     }
 
@@ -202,9 +201,9 @@ class TaskManagerTest {
         taskManager.addTask(newTask11);
         taskManager.addTask(newTask12);
 
-        taskManager.deleteTask(0);
+        taskManager.deleteTask(1);
 
-        Task actual = taskManager.getTaskId(1);
+        Task actual = taskManager.getTaskId(2);
         Assertions.assertNotNull(actual);
     }
 
@@ -213,13 +212,13 @@ class TaskManagerTest {
         SubTask expected = null;
         Epic newEpic11 = new Epic("Эпик1", "Описание эпика");
         taskManager.addEpic(newEpic11);
-        SubTask newSubTask11 = new SubTask("Подзадача 11", "Описание111",0);
+        SubTask newSubTask11 = new SubTask("Подзадача 11", "Описание111",1);
         taskManager.addSubTask(newSubTask11);
-        SubTask newSubTask12 = new SubTask("Подзадача 112", "Описание112", 0);
+        SubTask newSubTask12 = new SubTask("Подзадача 112", "Описание112", 1);
         taskManager.addSubTask(newSubTask12);
 
-        taskManager.deleteSubTask(1);
-        SubTask actual = taskManager.getSubTaskId(1);
+        taskManager.deleteSubTask(2);
+        SubTask actual = taskManager.getSubTaskId(2);
 
         Assertions.assertNotEquals(expected, actual);
     }
@@ -229,10 +228,10 @@ class TaskManagerTest {
 
         Task newTask = new Task("Задача6", "Описание6");
         taskManager.addTask(newTask);
-        taskManager.getTaskId(0);
-        Task newTask2 = new Task(0, "Задача 7", "Описание15", StateTask.IN_PROGRESS);
-        taskManager.addTask(newTask2);
         taskManager.getTaskId(1);
+        Task newTask2 = new Task(1, "Задача 7", "Описание15", StateTask.IN_PROGRESS);
+        taskManager.addTask(newTask2);
+        taskManager.getTaskId(2);
 
         taskManager.deleteAllTasks();
         List<Task> history = taskManager.getHistory();
@@ -246,13 +245,13 @@ class TaskManagerTest {
 
         Epic newEpic = new Epic("Эпик2", "Описание эпика2");
         taskManager.addEpic(newEpic);
-        taskManager.getEpicId(0);
+        taskManager.getEpicId(1);
         Epic newEpic2 = new Epic("Эпик 3", "Описание эпика 3");
         taskManager.addEpic(newEpic2);
-        taskManager.getEpicId(1);
-        SubTask newSubTask1 = new SubTask("Подзадача 0", "Описание подзадачи 0", 0);
+        taskManager.getEpicId(2);
+        SubTask newSubTask1 = new SubTask("Подзадача 0", "Описание подзадачи 0", 1);
         taskManager.addSubTask(newSubTask1);
-        taskManager.getSubTaskId(2);
+        taskManager.getSubTaskId(3);
 
         taskManager.deleteAllEpics();
         List<Task> history = taskManager.getHistory();
@@ -266,12 +265,12 @@ class TaskManagerTest {
 
         Epic newEpic = new Epic("Эпик", "Описание эпика");
         taskManager.addEpic(newEpic);
-        SubTask newSubTask = new SubTask("Подзадача 01", "Описание подзадачи 01", 0);
+        SubTask newSubTask = new SubTask("Подзадача 01", "Описание подзадачи 01", 1);
         taskManager.addSubTask(newSubTask);
-        taskManager.getSubTaskId(1);
-        SubTask newSubTask1 = new SubTask("Подзадача 02", "Описание подзадачи 02", 0);
-        taskManager.addSubTask(newSubTask1);
         taskManager.getSubTaskId(2);
+        SubTask newSubTask1 = new SubTask("Подзадача 02", "Описание подзадачи 02", 1);
+        taskManager.addSubTask(newSubTask1);
+        taskManager.getSubTaskId(3);
 
         taskManager.deleteAllSubTask();
         List<Task> history = taskManager.getHistory();

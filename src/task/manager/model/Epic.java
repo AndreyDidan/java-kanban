@@ -25,4 +25,14 @@ public class Epic extends Task {
     public void deleteAllSubTask() {
         subTasksInEpic.clear();
     }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
+    }
+
+    @Override
+    public Integer getIdEpic() {
+        return null;
+    }
 }
