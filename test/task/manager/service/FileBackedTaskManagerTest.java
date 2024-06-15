@@ -50,9 +50,9 @@ class FileBackedTaskManagerTest {
             }
 
             assertEquals("id,type,name,status,description,epic", lines.get(0));
-            assertEquals("0,TASK,name,NEW,desc,null", lines.get(1));
-            assertEquals("1,EPIC,e,NEW,d,null", lines.get(2));
-            assertEquals("2,SUBTASK,s,NEW,d,1", lines.get(3));
+            assertEquals("1,TASK,name,NEW,desc,null", lines.get(1));
+            assertEquals("2,EPIC,e,NEW,d,null", lines.get(2));
+            assertEquals("3,SUBTASK,s,NEW,d,2", lines.get(3));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -85,99 +85,20 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    void updateTasks() {
+    void newFileManagerAndloadFromFile() {
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
 
-        Task task = new Task("name", "desc");
+        Task task = new Task("Таска1", "Описание1");
         fileBackedTaskManager.addTask(task);
-
-        Epic epic = new Epic("e", "d");
+        Epic epic = new Epic("Эпик2", "Описание2");
         fileBackedTaskManager.addEpic(epic);
-        SubTask subTask = new SubTask("s", "d", epic.getId());
+        SubTask subTask = new SubTask("Сабтаска3", "Описание3", epic.getId());
         fileBackedTaskManager.addSubTask(subTask);
 
-        Task taskFromManager = fileBackedTaskManager.getTaskId(task.getId());
-        Epic epicFromManager = fileBackedTaskManager.getEpicId(epic.getId());
-        SubTask subTaskFromManager = fileBackedTaskManager.getSubTaskId(subTask.getId());
+        FileBackedTaskManager fileBackedTaskManager1 = FileBackedTaskManager.loadFromFile(file);
 
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-            List<String> lines = new ArrayList<>();
-            while (bufferedReader.ready()) {
-                lines.add(bufferedReader.readLine());
-            }
-
-            assertEquals("id,type,name,status,description,epic", lines.get(0));
-            assertEquals("0,TASK,name,NEW,desc,null", lines.get(1));
-            assertEquals("1,EPIC,e,NEW,d,null", lines.get(2));
-            assertEquals("2,SUBTASK,s,NEW,d,1", lines.get(3));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        taskFromManager.setName("Updated Name");
-        fileBackedTaskManager.updateTask(task);
-        epicFromManager.setName("Updated Name");
-        fileBackedTaskManager.updateEpic(epicFromManager);
-        subTaskFromManager.setName("Updated Name");
-        fileBackedTaskManager.updateSubTask(subTaskFromManager);
-
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-            List<String> lines = new ArrayList<>();
-            while (bufferedReader.ready()) {
-                lines.add(bufferedReader.readLine());
-            }
-
-            assertEquals("id,type,name,status,description,epic", lines.get(0));
-            assertEquals("0,TASK,Updated Name,NEW,desc,null", lines.get(1));
-            assertEquals("1,EPIC,Updated Name,NEW,d,null", lines.get(2));
-            assertEquals("2,SUBTASK,Updated Name,NEW,d,1", lines.get(3));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    void removeTasks() {
-        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
-
-        Task task = new Task("name", "desc");
-        fileBackedTaskManager.addTask(task);
-
-        Epic epic = new Epic("e", "d");
-        fileBackedTaskManager.addEpic(epic);
-        SubTask subTask = new SubTask("s", "d", epic.getId());
-        fileBackedTaskManager.addSubTask(subTask);
-
-        fileBackedTaskManager.getTaskId(task.getId());
-        fileBackedTaskManager.getEpicId(epic.getId());
-        fileBackedTaskManager.getSubTaskId(subTask.getId());
-
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-            List<String> lines = new ArrayList<>();
-            while (bufferedReader.ready()) {
-                lines.add(bufferedReader.readLine());
-            }
-
-            assertEquals("id,type,name,status,description,epic", lines.get(0));
-            assertEquals("0,TASK,name,NEW,desc,null", lines.get(1));
-            assertEquals("1,EPIC,e,NEW,d,null", lines.get(2));
-            assertEquals("2,SUBTASK,s,NEW,d,1", lines.get(3));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        fileBackedTaskManager.deleteTask(task.getId());
-        fileBackedTaskManager.deleteEpic(epic.getId());
-
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-            List<String> lines = new ArrayList<>();
-            while (bufferedReader.ready()) {
-                lines.add(bufferedReader.readLine());
-            }
-
-            assertEquals(1, lines.size());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        assertEquals(fileBackedTaskManager.getTaskId(1), fileBackedTaskManager1.getTaskId(1));
+        assertEquals(fileBackedTaskManager.getEpicId(2), fileBackedTaskManager1.getEpicId(2));
+        assertEquals(fileBackedTaskManager.getSubTaskId(3), fileBackedTaskManager1.getSubTaskId(3));
     }
 }

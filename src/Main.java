@@ -26,9 +26,9 @@ public class Main {
         Task newTask3 = new Task("Задача 3", "Описание3");
         taskManager.addTask(newTask3);
 
-        taskManager.getTaskId(0);
-        taskManager.getEpicId(1);
-        taskManager.getSubTaskId(2);
+        taskManager.getTaskId(1);
+        taskManager.getEpicId(2);
+        taskManager.getSubTaskId(3);
 
         List<Task> history = taskManager.getHistory();
         System.out.println(history);
@@ -47,10 +47,10 @@ public class Main {
         taskManagerLoad.addSubTask(newSubTask7);
 
 
-        taskManagerLoad.getTaskId(0);
-        taskManagerLoad.getEpicId(1);
-        taskManagerLoad.getSubTaskId(2);
-        taskManagerLoad.getTaskId(3);
+        taskManagerLoad.getTaskId(1);
+        taskManagerLoad.getEpicId(2);
+        taskManagerLoad.getSubTaskId(3);
+        taskManagerLoad.getTaskId(4);
 
         List<Task> history1 = taskManagerLoad.getHistory();
         System.out.println(history1);

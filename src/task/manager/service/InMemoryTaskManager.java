@@ -22,7 +22,7 @@ public class InMemoryTaskManager implements TaskManager {
         this.tasks = new HashMap<>();
         this.epics = new HashMap<>();
         this.subTasks = new HashMap<>();
-        this.id = 0;
+        this.id = 1;
     }
 
 
@@ -61,7 +61,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     //Метод изменения статуса эпика
-    private void changeEpicState(Epic epic) {
+    protected void changeEpicState(Epic epic) {
 
         boolean isNew = false;
         boolean isInProgress = false;
