@@ -1,5 +1,6 @@
 package task.manager.service;
 
+import exception.ValidationException;
 import task.manager.model.Epic;
 import task.manager.model.StateTask;
 import task.manager.model.SubTask;
@@ -9,7 +10,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TaskManagerTest {
 
@@ -29,7 +35,7 @@ class TaskManagerTest {
         taskManager.addTask(newTask);
 
         Task actual = taskManager.getTaskId(1);
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -43,7 +49,7 @@ class TaskManagerTest {
         taskManager.addSubTask(newSubTask);
 
         SubTask actual = taskManager.getSubTaskId(2);
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -55,7 +61,7 @@ class TaskManagerTest {
 
         Task actual = taskManager.getTaskId(1);
 
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -69,7 +75,7 @@ class TaskManagerTest {
 
         SubTask actual = taskManager.getSubTaskId(2);
 
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -86,8 +92,8 @@ class TaskManagerTest {
         Epic actual1 = taskManager.getEpicId(1);
         Epic actual2 = taskManager.getEpicId(2);
 
-        Assertions.assertEquals(newEpic, actual1);
-        Assertions.assertEquals(newEpic2, actual2);
+        assertEquals(newEpic, actual1);
+        assertEquals(newEpic2, actual2);
     }
 
     @Test
@@ -103,8 +109,8 @@ class TaskManagerTest {
         taskManager.getTaskId(2);
         List<Task> history = taskManager.getHistory();
 
-        Assertions.assertEquals(2, history.size());
-        Assertions.assertEquals(newTask1, history.get(1));
+        assertEquals(2, history.size());
+        assertEquals(newTask1, history.get(1));
     }
 
     @Test
@@ -120,8 +126,8 @@ class TaskManagerTest {
         taskManager.getSubTaskId(2);
         List<Task> history = taskManager.getHistory();
 
-        Assertions.assertEquals(2, history.size());
-        Assertions.assertEquals(expected, history.get(1));
+        assertEquals(2, history.size());
+        assertEquals(expected, history.get(1));
     }
 
     @Test
@@ -133,7 +139,7 @@ class TaskManagerTest {
 
         Task expected = taskManager.getTaskId(1);
 
-        Assertions.assertEquals(expected, task2);
+        assertEquals(expected, task2);
     }
 
     @Test
@@ -147,7 +153,7 @@ class TaskManagerTest {
 
         SubTask expected = taskManager.getSubTaskId(2);
 
-        Assertions.assertEquals(expected, subTask3);
+        assertEquals(expected, subTask3);
     }
 
     @Test
@@ -163,8 +169,8 @@ class TaskManagerTest {
         List<Task> history = taskManager.getHistory();
         int coin = history.size();
 
-        Assertions.assertEquals(1, coin);
-        Assertions.assertEquals(newTask2, history.get(0));
+        assertEquals(1, coin);
+        assertEquals(newTask2, history.get(0));
     }
 
     @Test
@@ -190,7 +196,7 @@ class TaskManagerTest {
         taskManager.addSubTask(subTask2);
 
         SubTask actual = taskManager.getSubTaskId(2);
-        Assertions.assertEquals(subTask1, actual);
+        assertEquals(subTask1, actual);
     }
 
     @Test
@@ -237,7 +243,7 @@ class TaskManagerTest {
         List<Task> history = taskManager.getHistory();
         int coin = 0;
 
-        Assertions.assertEquals(coin, history.size());
+        assertEquals(coin, history.size());
     }
 
     @Test
@@ -257,7 +263,7 @@ class TaskManagerTest {
         List<Task> history = taskManager.getHistory();
         int coin = 0;
 
-        Assertions.assertEquals(coin, history.size());
+        assertEquals(coin, history.size());
     }
 
     @Test
@@ -276,6 +282,37 @@ class TaskManagerTest {
         List<Task> history = taskManager.getHistory();
         int coin = 0;
 
-        Assertions.assertEquals(coin, history.size());
+        assertEquals(coin, history.size());
+    }
+
+    @Test
+    public void shouldCrossing() {
+        Epic epic = new Epic("Эпик", "Тест");
+        epic.setId(1);
+        taskManager.addEpic(epic);
+        Task testTask = new Task("Таск", "Тест", LocalDateTime.now(), Duration.ofHours(1));
+        taskManager.addTask(testTask);
+        Task crossTask = new Task("Таск1", "Тест", LocalDateTime.now(), Duration.ofHours(1));
+        assertThrows(ValidationException.class, () -> taskManager.addTask(crossTask), "Таски пересекаются");
+
+        SubTask crossSubtask = new SubTask("Подзадача", "Тест", 1,
+                LocalDateTime.now(), Duration.ofDays(1));
+        assertThrows(ValidationException.class, () -> taskManager.addSubTask(crossSubtask));
+
+        crossSubtask.setStartTime(LocalDateTime.now().minus(Duration.ofHours(2)));
+        assertThrows(ValidationException.class, () -> taskManager.addSubTask(crossSubtask));
+
+        crossSubtask.setStartTime(LocalDateTime.now().plus(Duration.ofMinutes(10)));
+        assertThrows(ValidationException.class, () -> taskManager.addSubTask(crossSubtask));
+
+        Task notCrossTask = new Task("Таск2", "Тест",
+                LocalDateTime.now().plus(Duration.ofDays(1)), Duration.ofMinutes(30));
+        taskManager.addTask(notCrossTask);
+        assertEquals(notCrossTask, taskManager.getTaskId(7));
+
+        SubTask notCrossSubtask = new SubTask("Подзадача", "Тест", 1,
+                LocalDateTime.now().plus(Duration.ofDays(2)), Duration.ofMinutes(50));
+        taskManager.addSubTask(notCrossSubtask);
+        assertEquals(notCrossSubtask, taskManager.getSubTaskId(8));
     }
 }
