@@ -64,5 +64,6 @@ public class Main {
 
         List<Task> history1 = taskManagerLoad.getHistory();
         System.out.println(history1);
+        System.out.println(taskManagerLoad.getPrioritizedTask());
     }
 }

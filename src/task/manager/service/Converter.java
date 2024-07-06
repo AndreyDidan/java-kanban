@@ -7,8 +7,19 @@ import java.time.LocalDateTime;
 
 public class Converter {
     protected static String toString(Task task) {
-        return task.getId() + "," + task.getType() + "," + task.getName() + "," + task.getStateTask() + ","
-                + task.getDescription() + "," + task.getIdEpic() + "," + task.getStartTime() + "," + task.getDuration();
+        Duration dur = task.getDuration();
+        String s;
+        if (dur == null) {
+            s = task.getId() + "," + task.getType() + "," + task.getName() + "," + task.getStateTask() + ","
+                    + task.getDescription() + "," + task.getIdEpic() + "," + task.getStartTime() + ","
+                    + "null";
+        } else {
+            s = task.getId() + "," + task.getType() + "," + task.getName() + "," + task.getStateTask() + ","
+                    + task.getDescription() + "," + task.getIdEpic() + "," + task.getStartTime() + ","
+                    + task.getDuration().toMinutes();
+        }
+
+        return s;
     }
 
     protected static Task fromString(String value) {
@@ -26,7 +37,8 @@ public class Converter {
 
             if (!update[6].equals("null") && !update[7].equals("null")) {
                 startTimeString = LocalDateTime.parse(update[6]);
-                durationString = Duration.parse((update[7]));
+                long minutes = Integer.parseInt(update[7]);
+                durationString = Duration.ofMinutes(minutes);
             }
 
             if (update[6].equals("null")) {

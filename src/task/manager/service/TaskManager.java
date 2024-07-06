@@ -6,6 +6,7 @@ import task.manager.model.Task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 public interface TaskManager {
     //Добавление задач
@@ -55,4 +56,5 @@ public interface TaskManager {
 
     List<Task> getHistory();
 
+    TreeSet<Task> getPrioritizedTask();
 }

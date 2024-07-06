@@ -15,36 +15,38 @@ public class Task {
     private Duration duration;
     private LocalDateTime endTime;
 
-    public Task(int id, String name, String description, StateTask stateTask) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.stateTask = stateTask;
-    }
-
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
-        stateTask = StateTask.NEW;
+        this.stateTask = StateTask.NEW;
+        this.startTime = null;
+        this.duration = null;
+    }
+
+    public Task(int id, String name, String description, StateTask stateTask) {
+        this(name, description);
+        this.id = id;
+        this.stateTask = stateTask;
+        this.startTime = null;
+        this.duration = null;
     }
 
     public Task(String name, String description, LocalDateTime startTime, Duration duration) {
-        this.name = name;
-        this.description = description;
-        stateTask = StateTask.NEW;
+        this(name,description);
+        /*this.name = name;
+        this.description = description;*/
+        this.stateTask = StateTask.NEW;
         this.startTime = startTime;
         this.duration = duration;
-        this.endTime = startTime.plus(duration.toMinutes(), ChronoUnit.MINUTES);
+        this.endTime = getEndTime();
     }
 
     public Task(int id, String name, String description, StateTask stateTask, LocalDateTime startTime, Duration duration) {
+        this(name, description, startTime, duration);
         this.id = id;
-        this.name = name;
-        this.description = description;
+
         this.stateTask = stateTask;
-        this.startTime = startTime;
-        this.duration = duration;
-        this.endTime = startTime.plus(duration.toMinutes(), ChronoUnit.MINUTES);
+        this.endTime = getEndTime();
     }
 
     public Integer getIdEpic() {
@@ -104,12 +106,12 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
-        return endTime;
+        return startTime.plus(duration.toMinutes(), ChronoUnit.MINUTES);
     }
 
-    public void setEndTime(LocalDateTime endTime) {
+    /*public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
-    }
+    }*/
 
     @Override
     public boolean equals(Object o) {

@@ -23,7 +23,7 @@ class ConverterTest {
         assertEquals(expectedSubTask, Converter.fromString(subTaskString));
 
         String subTaskStringWithDurationAndStartTime = "8,SUBTASK,Подзадача 7,NEW,Описание подзадачи 7,7," +
-                "2024-07-02T02:29:39.803947700,PT5M";
+                "2024-07-02T02:29:39.803947700,5";
         expectedSubTask = new SubTask("Подзадача 7", "Описание подзадачи 7", StateTask.NEW, 7,
                 8, LocalDateTime.parse("2024-07-02T02:29:39.803947700"), Duration.ofMinutes(5));
         expectedSubTask.setId(8);
@@ -37,7 +37,7 @@ class ConverterTest {
 
         assertEquals(expectedTask, Converter.fromString(taskString));
 
-        String taskStringWithTime = "1,TASK,Задача 3,NEW,Описание3,null,2024-07-02T01:29:39.814946800,PT10M";
+        String taskStringWithTime = "1,TASK,Задача 3,NEW,Описание3,null,2024-07-02T01:29:39.814946800,10";
         expectedTask = new Task(1, "name1", "descript1", StateTask.NEW,
                 LocalDateTime.parse("2024-07-02T01:29:39.814946800"), Duration.ofMinutes(10));
         expectedTask.setId(1);

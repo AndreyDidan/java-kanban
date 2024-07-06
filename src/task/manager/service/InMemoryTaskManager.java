@@ -19,6 +19,8 @@ public class InMemoryTaskManager implements TaskManager {
     protected HashMap<Integer, Epic> epics;
     protected HistoryManager historyManager;
 
+    TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
+
     public InMemoryTaskManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
         this.tasks = new HashMap<>();
@@ -31,6 +33,11 @@ public class InMemoryTaskManager implements TaskManager {
         return id++;
     }
 
+    @Override
+    public TreeSet<Task> getPrioritizedTask() {
+        return new TreeSet<>(prioritizedTasks);
+    }
+
     //Добавление задач
     @Override
     public Task addTask(Task newTask) {
@@ -38,8 +45,10 @@ public class InMemoryTaskManager implements TaskManager {
         tasks.put(newTask.getId(), newTask);
         if (newTask.getStartTime() != null) {
             if (isTaskTimeValid(newTask)) {
-                isCheckTaskTime(newTask);
-            } else throw new ValidationException("Задача пересекается по времени");
+                if (!isCheckTaskTime(newTask)) {
+                    prioritizedTasks.add(newTask);
+                } else throw new ValidationException("Задача пересекается по времени");
+            }
         }
         return newTask;
     }
@@ -61,8 +70,10 @@ public class InMemoryTaskManager implements TaskManager {
             changeEpicState(epics.get(newSubTask.getIdEpic()));
             if (newSubTask.getStartTime() != null) {
                 if (isTaskTimeValid(newSubTask)) {
-                    isCheckTaskTime(newSubTask);
-                } else throw new ValidationException("Подзадача пересекается по времени");
+                    if (!isCheckTaskTime(newSubTask)) {
+                        prioritizedTasks.add(newSubTask);
+                    } else throw new ValidationException("Подзадача пересекается по времени");
+                }
             }
             updateTimeAndDurationEpic(epic);
         }
@@ -109,9 +120,9 @@ public class InMemoryTaskManager implements TaskManager {
         }
         if (updateTask.getStartTime() != null) {
             if (isTaskTimeValid(updateTask)) {
-                isCheckTaskTime(updateTask);
-            } else {
-                throw new ValidationException("Задачи пересекаются");
+                if (!isCheckTaskTime(updateTask)) {
+                    prioritizedTasks.add(updateTask);
+                }
             }
         }
     }
@@ -126,9 +137,9 @@ public class InMemoryTaskManager implements TaskManager {
         }
         if (updateSubTask.getStartTime() != null) {
             if (isTaskTimeValid(updateSubTask)) {
-                isCheckTaskTime(updateSubTask);
-            } else {
-                throw new ValidationException("Задачи пересекаются");
+                if (!isCheckTaskTime(updateSubTask)) {
+                    prioritizedTasks.add(updateSubTask);
+                }
             }
             updateTimeAndDurationEpic(epics.get(updateSubTask.getIdEpic()));
         }
@@ -139,16 +150,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (epics.containsKey(updateEpic.getId())) {
             epics.get(updateEpic.getId()).setName(updateEpic.getName());
             epics.get(updateEpic.getId()).setDescription(updateEpic.getDescription());
-        } else {
-            throw new NotFoundException("Эпик не найден, Epic id=" + updateEpic.getId());
         }
-    }
-
-    public TreeSet<Task> getPrioritizedTasks() {
-        TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
-        tasks.values().stream().filter(task -> task.getStartTime() != null).forEach(prioritizedTasks::add);
-        subTasks.values().stream().filter(subTask -> subTask.getStartTime() != null).forEach(prioritizedTasks::add);
-        return prioritizedTasks;
     }
 
     protected void updateTimeAndDurationEpic(Epic epic) {
@@ -158,7 +160,7 @@ public class InMemoryTaskManager implements TaskManager {
                 if (!subTasksInEpic.isEmpty()) {
 
                     Duration epicDuration = subTasksInEpic.stream()
-                            .map(SubTask::getDuration)
+                            .map(Task::getDuration)
                             .reduce(Duration.ZERO, Duration::plus);
 
                     epic.setDuration(epicDuration);
@@ -179,6 +181,9 @@ public class InMemoryTaskManager implements TaskManager {
                         epic.setEndTime(latestSubTaskEndTime);
                     }
 
+                    /*Duration epicDuration = Duration.between(epic.getEndTime(), epic.getEndTime());
+                    epic.setDuration(epicDuration);*/
+
                 } else {
                     epic.setStartTime(null);
                     epic.setDuration(null);
@@ -189,14 +194,16 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     // проверка на пересечение времени задач
-    private void isCheckTaskTime(Task newTask) {
+    private boolean isCheckTaskTime(Task newTask) {
         LocalDateTime newStartInstant = newTask.getStartTime();
         LocalDateTime newEndInstant = newTask.getEndTime();
-        boolean tasksCollide =  getPrioritizedTasks().stream()
+        boolean tasksCollide =  prioritizedTasks.stream()
                 .filter(task -> task.getId() != newTask.getId())
-                .anyMatch(task -> newStartInstant.isBefore(task.getEndTime())
-                        && newEndInstant.isAfter(task.getStartTime()));
+                .anyMatch(task -> (newStartInstant.isBefore(task.getStartTime())
+                        && newEndInstant.isAfter(task.getStartTime())) || (task.getStartTime().isBefore(newStartInstant)
+                        && task.getEndTime().isAfter(newStartInstant)));
         if (tasksCollide) throw new ValidationException("Время задач пересекается!");
+        return tasksCollide;
     }
 
     //метод для валидации времени в таске

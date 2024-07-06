@@ -24,7 +24,7 @@ public class SubTask extends Task {
         this.idEpic = idEpic;
         this.setStartTime(startTime);
         this.setDuration(duration);
-        this.endTime = startTime.plus(duration.toMinutes(), ChronoUnit.MINUTES);
+        this.endTime = getEndTime();
     }
 
     public SubTask(String name, String description, StateTask stateTask, int idEpic, int id, LocalDateTime startTime,
@@ -33,7 +33,7 @@ public class SubTask extends Task {
         this.idEpic = idEpic;
         this.setStartTime(startTime);
         this.setDuration(duration);
-        this.endTime = startTime.plus(duration.toMinutes(), ChronoUnit.MINUTES);
+        this.endTime = getEndTime();
     }
 
     public void setIdEpic(int idEpic) {
