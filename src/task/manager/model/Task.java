@@ -33,8 +33,6 @@ public class Task {
 
     public Task(String name, String description, LocalDateTime startTime, Duration duration) {
         this(name,description);
-        /*this.name = name;
-        this.description = description;*/
         this.stateTask = StateTask.NEW;
         this.startTime = startTime;
         this.duration = duration;
@@ -108,10 +106,6 @@ public class Task {
     public LocalDateTime getEndTime() {
         return startTime.plus(duration.toMinutes(), ChronoUnit.MINUTES);
     }
-
-    /*public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }*/
 
     @Override
     public boolean equals(Object o) {

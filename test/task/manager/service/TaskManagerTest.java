@@ -465,11 +465,11 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.addSubTask(subTaskPriority3);
         taskManager.addSubTask(subTaskPriority2);
 
-        TreeSet<Task> prioritizedTasks = taskManager.getPrioritizedTask();
+        List<Task> prioritizedTasks = taskManager.getPrioritizedTask();
 
         assertEquals(3, prioritizedTasks.size());
-        assertEquals(taskPriority1, prioritizedTasks.first());
-        assertEquals(subTaskPriority3, prioritizedTasks.last());
+        assertEquals(taskPriority1, prioritizedTasks.getFirst());
+        assertEquals(subTaskPriority3, prioritizedTasks.getLast());
     }
 
 
@@ -487,11 +487,11 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.addEpic(epic);
         taskManager.addSubTask(subTaskPriority2);
 
-        TreeSet<Task> prioritizedTasks = taskManager.getPrioritizedTask();
+        List<Task> prioritizedTasks = taskManager.getPrioritizedTask();
 
         assertEquals(2, prioritizedTasks.size());
-        assertEquals(taskPriority1, prioritizedTasks.first());
-        assertEquals(subTaskPriority2, prioritizedTasks.last());
+        assertEquals(taskPriority1, prioritizedTasks.getFirst());
+        assertEquals(subTaskPriority2, prioritizedTasks.getLast());
     }
 
     @Test

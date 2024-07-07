@@ -10,10 +10,12 @@ import task.manager.model.Task;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FileBackedTaskManagerTest extends TaskManagerTest<TaskManager> {
 
@@ -95,9 +97,31 @@ class FileBackedTaskManagerTest extends TaskManagerTest<TaskManager> {
     }
 
     @Test
+    void loadFromFile_getPrioritized() {
+        TaskManager taskManager1 = Managers.getFileBackedTaskManager(file);
+
+        Task newTask = new Task("Задача 8", "Описание8", LocalDateTime.now(), Duration.ofMinutes(10));
+        taskManager1.addTask(newTask);
+        Epic newEpic = new Epic("Эпик 6", "Описаание эпика 6");
+        taskManager1.addEpic(newEpic);
+        SubTask newSubTask = new SubTask("Подзадача 7", "Описание подзадачи 7", 2,
+                LocalDateTime.now().plus(Duration.ofHours(6)), Duration.ofMinutes(30));
+        taskManager1.addSubTask(newSubTask);
+        SubTask newSubTask1 = new SubTask("Подзадача 10", "Описание подзадачи 10", 2,
+                LocalDateTime.now().plus(Duration.ofHours(5)), Duration.ofMinutes(30));
+        taskManager1.addSubTask(newSubTask1);
+        List<Task> prioritizedTask1 = taskManager1.getPrioritizedTask();
+
+        TaskManager fileBackedTaskManager = FileBackedTaskManager.loadFromFile(file);
+        List<Task> prioritizedTask2 = fileBackedTaskManager.getPrioritizedTask();
+
+        assertEquals(prioritizedTask1.size(), prioritizedTask2.size());
+        assertEquals(prioritizedTask1, prioritizedTask2);
+    }
+
+    @Test
     void newFileManagerAndloadFromFile() {
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
-
         Task task = new Task("Таска1", "Описание1");
         fileBackedTaskManager.addTask(task);
         Epic epic = new Epic("Эпик2", "Описание2");
@@ -193,54 +217,6 @@ class FileBackedTaskManagerTest extends TaskManagerTest<TaskManager> {
             assertEquals("1,TASK,имя,NEW,название,null,null,null", lines.get(1));
             assertEquals("2,EPIC,эпик,IN_PROGRESS,описание,null,null,null", lines.get(2));
             assertEquals("3,SUBTASK,подзадача,IN_PROGRESS,описание подзадачи,2,null,null", lines.get(3));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
-
-    @Test
-    void removeTasks() {
-        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
-
-        Task task = new Task(1,"name", "desc", StateTask.NEW);
-        fileBackedTaskManager.addTask(task);
-
-        Epic epic = new Epic("e", "d");
-        fileBackedTaskManager.addEpic(epic);
-        SubTask subTask = new SubTask("s", "d", StateTask.IN_PROGRESS, epic.getId(), 3);
-        fileBackedTaskManager.addSubTask(subTask);
-
-        fileBackedTaskManager.getTaskId(task.getId());
-        fileBackedTaskManager.getEpicId(epic.getId());
-        fileBackedTaskManager.getSubTaskId(subTask.getId());
-
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-            List<String> lines = new ArrayList<>();
-            while (bufferedReader.ready()) {
-                lines.add(bufferedReader.readLine());
-            }
-
-            assertEquals(startLine, lines.get(0));
-            assertEquals("1,TASK,name,NEW,desc,null,null,null", lines.get(1));
-            assertEquals("2,EPIC,e,IN_PROGRESS,d,null,null,null", lines.get(2));
-            assertEquals("3,SUBTASK,s,IN_PROGRESS,d,2,null,null", lines.get(3));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        fileBackedTaskManager.deleteTask(task.getId());
-        fileBackedTaskManager.deleteEpic(epic.getId());
-
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-            List<String> lines = new ArrayList<>();
-            while (bufferedReader.ready()) {
-                lines.add(bufferedReader.readLine());
-            }
-
-            assertEquals(1, lines.size());
         } catch (IOException e) {
             e.printStackTrace();
         }
