@@ -32,7 +32,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest<TaskManager> {
         SubTask subTask1 = new SubTask("Подзадача 22", "Описание 22", 1,
                 LocalDateTime.of(2024, 5, 2, 11, 15), Duration.ofMinutes(15));
         SubTask subTask2 = new SubTask("Подзадача 23", "Описание 23", 1,
-                LocalDateTime.of(2024, 5, 2, 11, 30), Duration.ofMinutes(15));
+                LocalDateTime.of(2024, 5, 2, 11, 31), Duration.ofMinutes(15));
         taskManager.addEpic(epic);
         taskManager.addSubTask(subTask1);
         taskManager.addSubTask(subTask2);

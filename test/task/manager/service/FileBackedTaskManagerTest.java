@@ -97,29 +97,6 @@ class FileBackedTaskManagerTest extends TaskManagerTest<TaskManager> {
     }
 
     @Test
-    void loadFromFile_getPrioritized() {
-        TaskManager taskManager1 = Managers.getFileBackedTaskManager(file);
-
-        Task newTask = new Task("Задача 8", "Описание8", LocalDateTime.now(), Duration.ofMinutes(10));
-        taskManager1.addTask(newTask);
-        Epic newEpic = new Epic("Эпик 6", "Описаание эпика 6");
-        taskManager1.addEpic(newEpic);
-        SubTask newSubTask = new SubTask("Подзадача 7", "Описание подзадачи 7", 2,
-                LocalDateTime.now().plus(Duration.ofHours(6)), Duration.ofMinutes(30));
-        taskManager1.addSubTask(newSubTask);
-        SubTask newSubTask1 = new SubTask("Подзадача 10", "Описание подзадачи 10", 2,
-                LocalDateTime.now().plus(Duration.ofHours(5)), Duration.ofMinutes(30));
-        taskManager1.addSubTask(newSubTask1);
-        List<Task> prioritizedTask1 = taskManager1.getPrioritizedTask();
-
-        TaskManager fileBackedTaskManager = FileBackedTaskManager.loadFromFile(file);
-        List<Task> prioritizedTask2 = fileBackedTaskManager.getPrioritizedTask();
-
-        assertEquals(prioritizedTask1.size(), prioritizedTask2.size());
-        assertEquals(prioritizedTask1, prioritizedTask2);
-    }
-
-    @Test
     void newFileManagerAndloadFromFile() {
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
         Task task = new Task("Таска1", "Описание1");
@@ -193,19 +170,20 @@ class FileBackedTaskManagerTest extends TaskManagerTest<TaskManager> {
 
     @Test
     void deleteTask() {
-        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
+        TaskManager taskManager1 = Managers.getFileBackedTaskManager(file);
 
-        Task task = new Task("имя", "название");
-        fileBackedTaskManager.addTask(task);
-
-        Epic epic = new Epic("эпик", "описание");
-        fileBackedTaskManager.addEpic(epic);
-        SubTask subTask = new SubTask("подзадача", "описание подзадачи", StateTask.IN_PROGRESS, epic.getId(), 2);
-        fileBackedTaskManager.addSubTask(subTask);
-
-        fileBackedTaskManager.getTaskId(task.getId());
-        fileBackedTaskManager.getEpicId(epic.getId());
-        fileBackedTaskManager.getSubTaskId(subTask.getId());
+        Task newTask = new Task("Задача 8", "Описание8",
+                LocalDateTime.of(2024, 7, 8, 9, 17), Duration.ofMinutes(10));
+        taskManager1.addTask(newTask);
+        Epic newEpic = new Epic("Эпик 6", "Описаание эпика 6");
+        taskManager1.addEpic(newEpic);
+        SubTask newSubTask = new SubTask("Подзадача 7", "Описание подзадачи 7", 2,
+                LocalDateTime.of(2024, 7, 8, 11, 17), Duration.ofMinutes(30));
+        taskManager1.addSubTask(newSubTask);
+        SubTask newSubTask1 = new SubTask("Подзадача 10", "Описание подзадачи 10", 2,
+                LocalDateTime.of(2024, 7, 8, 10, 0), Duration.ofMinutes(30));
+        taskManager1.addSubTask(newSubTask1);
+        List<Task> prioritizedTask1 = taskManager1.getPrioritizedTask();
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
             List<String> lines = new ArrayList<>();
@@ -214,11 +192,44 @@ class FileBackedTaskManagerTest extends TaskManagerTest<TaskManager> {
             }
 
             assertEquals("id,type,name,status,description,epic,startTime,duration", lines.get(0));
-            assertEquals("1,TASK,имя,NEW,название,null,null,null", lines.get(1));
-            assertEquals("2,EPIC,эпик,IN_PROGRESS,описание,null,null,null", lines.get(2));
-            assertEquals("3,SUBTASK,подзадача,IN_PROGRESS,описание подзадачи,2,null,null", lines.get(3));
+            assertEquals("1,TASK,Задача 8,NEW,Описание8,null,2024-07-08T09:17,10", lines.get(1));
+            assertEquals("2,EPIC,Эпик 6,NEW,Описаание эпика 6,null,2024-07-08T10:00,60",
+                    lines.get(2));
+            assertEquals("3,SUBTASK,Подзадача 7,NEW,Описание подзадачи 7,2,2024-07-08T11:17,30", lines.get(3));
+            assertEquals("4,SUBTASK,Подзадача 10,NEW,Описание подзадачи 10,2,2024-07-08T10:00,30", lines.get(4));
+            assertEquals(3, prioritizedTask1.size());
+            assertEquals(newTask, prioritizedTask1.get(0));
+            assertEquals(newSubTask1, prioritizedTask1.get(1));
+            assertEquals(newSubTask, prioritizedTask1.get(2));
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        TaskManager fileBackedTaskManager = FileBackedTaskManager.loadFromFile(file);
+        List<Task> prioritizedTask2 = fileBackedTaskManager.getPrioritizedTask();
+
+        assertEquals(3, prioritizedTask2.size());
+        assertEquals(newTask, prioritizedTask2.get(0));
+        assertEquals(newSubTask1, prioritizedTask2.get(1));
+        assertEquals(newSubTask, prioritizedTask2.get(2));
+        assertEquals(prioritizedTask1, prioritizedTask2);
+
+        fileBackedTaskManager.deleteTask(newTask.getId());
+        fileBackedTaskManager.deleteEpic(newEpic.getId());
+
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
+            List<String> lines = new ArrayList<>();
+            while (bufferedReader.ready()) {
+                lines.add(bufferedReader.readLine());
+            }
+
+            assertEquals(1, lines.size());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        prioritizedTask2 = fileBackedTaskManager.getPrioritizedTask();
+        assertEquals(0, prioritizedTask2.size());
+
     }
 }

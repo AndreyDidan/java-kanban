@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -25,7 +24,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Task newTask1 = new Task("Задача 1", "Описание 1",
                 LocalDateTime.of(2024, 7, 2, 1, 0), Duration.ofMinutes(15));
         Task newTask2 = new Task("Задача 1_1", "Описание 1_1",
-                LocalDateTime.of(2024, 7, 2, 1, 15), Duration.ofMinutes(15));
+                LocalDateTime.of(2024, 7, 2, 1, 16), Duration.ofMinutes(15));
         taskManager.addTask(newTask1);
         taskManager.addTask(newTask2);
 
@@ -40,7 +39,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Task newTask1 = new Task(1, "Задача 2", "Описание 2", StateTask.NEW,
                 LocalDateTime.of(2024, 5, 2, 0, 30), Duration.ofMinutes(15));
         Task newTask2 = new Task("Задача 2_1", "Описание 2_1",
-                LocalDateTime.of(2024, 5, 2, 0, 45), Duration.ofMinutes(15));
+                LocalDateTime.of(2024, 5, 2, 0, 46), Duration.ofMinutes(15));
         taskManager.addTask(newTask1);
         taskManager.addTask(newTask2);
 
@@ -110,7 +109,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Task newTask1 = new Task("Задача 7", "Описание 7",
                 LocalDateTime.of(2024, 5, 2, 2, 45), Duration.ofMinutes(15));
         Task newTask2 = new Task("Задача 7_1", "Описание 7_1",
-                LocalDateTime.of(2024, 5, 2, 3, 0), Duration.ofMinutes(15));
+                LocalDateTime.of(2024, 5, 2, 3, 1), Duration.ofMinutes(15));
         taskManager.addTask(newTask1);
         taskManager.addTask(newTask2);
 
@@ -126,7 +125,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Task newTask1 = new Task(1, "Задача 8", "Описание 8", StateTask.NEW,
                 LocalDateTime.of(2024, 5, 2, 3, 15), Duration.ofMinutes(15));
         Task newTask2 = new Task(2, "Задача 9", "Описание 9", StateTask.NEW,
-                LocalDateTime.of(2024, 5, 2, 3, 30), Duration.ofMinutes(15));
+                LocalDateTime.of(2024, 5, 2, 3, 31), Duration.ofMinutes(15));
 
         taskManager.addTask(newTask1);
         taskManager.addTask(newTask2);
@@ -242,7 +241,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         SubTask subTask1 = new SubTask("Подзадача 5", "Описание 5", 1,
                 LocalDateTime.of(2024, 5, 2, 5, 30), Duration.ofMinutes(15));
         SubTask subTask2 = new SubTask("Подзадача 6", "Описание 6", 1,
-                LocalDateTime.of(2024, 5, 2, 5, 45), Duration.ofMinutes(15));
+                LocalDateTime.of(2024, 5, 2, 5, 46), Duration.ofMinutes(15));
         taskManager.addSubTask(subTask1);
         taskManager.addSubTask(subTask2);
 
@@ -261,7 +260,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         SubTask subTask1 = new SubTask("Подзадача 5", "Описание 5", 1,
                 LocalDateTime.of(2024, 5, 2, 5, 30), Duration.ofMinutes(15));
         SubTask subTask2 = new SubTask("Подзадача 6", "Описание 6", 1,
-                LocalDateTime.of(2024, 5, 2, 5, 45), Duration.ofMinutes(15));
+                LocalDateTime.of(2024, 5, 2, 5, 46), Duration.ofMinutes(15));
         taskManager.addSubTask(subTask1);
         taskManager.addSubTask(subTask2);
 
@@ -280,7 +279,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         SubTask subTask1 = new SubTask("Подзадача 5", "Описание 5", 1,
                 LocalDateTime.of(2024, 5, 2, 5, 30), Duration.ofMinutes(15));
         SubTask subTask2 = new SubTask("Подзадача 6", "Описание 6", 1,
-                LocalDateTime.of(2024, 5, 2, 5, 45), Duration.ofMinutes(15));
+                LocalDateTime.of(2024, 5, 2, 5, 46), Duration.ofMinutes(15));
         taskManager.addSubTask(subTask1);
         taskManager.addSubTask(subTask2);
 
@@ -333,7 +332,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Task newTask1 = new Task("Задача 10", "Описание 10",
                 LocalDateTime.of(2024, 5, 2, 6, 15), Duration.ofMinutes(15));
         Task newTask2 = new Task("Задача 11", "Описание 11",
-                LocalDateTime.of(2024, 5, 2, 6, 30), Duration.ofMinutes(15));
+                LocalDateTime.of(2024, 5, 2, 6, 31), Duration.ofMinutes(15));
         taskManager.addTask(newTask1);
         taskManager.addTask(newTask2);
         taskManager.getTaskId(newTask1.getId());
@@ -374,9 +373,9 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         SubTask subTask1 = new SubTask("Подзадача 10", "Описание 10", 1,
                 LocalDateTime.of(2024, 5, 2, 7, 45), Duration.ofMinutes(15));
         SubTask subTask2 = new SubTask("Подзадача 11", "Описание 11", 2,
-                LocalDateTime.of(2024, 5, 2, 8, 0), Duration.ofMinutes(15));
+                LocalDateTime.of(2024, 5, 2, 8, 1), Duration.ofMinutes(15));
         SubTask subTask3 = new SubTask("Подзадача 12", "Описание 12", 2,
-                LocalDateTime.of(2024, 5, 2, 8, 15), Duration.ofMinutes(15));
+                LocalDateTime.of(2024, 5, 2, 8, 17), Duration.ofMinutes(15));
         taskManager.addEpic(epic1);
         taskManager.addEpic(epic2);
         taskManager.addEpic(epic3);
@@ -418,9 +417,9 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         SubTask subTask1 = new SubTask("Подзадача 14", "Описание 14", 1,
                 LocalDateTime.of(2024, 5, 2, 8, 45), Duration.ofMinutes(15));
         SubTask subTask2 = new SubTask("Подзадача 15", "Описание 15", 1,
-                LocalDateTime.of(2024, 5, 2, 9, 0), Duration.ofMinutes(15));
+                LocalDateTime.of(2024, 5, 2, 9, 1), Duration.ofMinutes(15));
         SubTask subTask3 = new SubTask("Подзадача 16", "Описание 16", 1,
-                LocalDateTime.of(2024, 5, 2, 9, 15), Duration.ofMinutes(15));
+                LocalDateTime.of(2024, 5, 2, 9, 17), Duration.ofMinutes(15));
         taskManager.addSubTask(subTask1);
         taskManager.addSubTask(subTask2);
         taskManager.addSubTask(subTask3);
@@ -440,7 +439,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         SubTask subTask1 = new SubTask("Подзадача 20", "Описание 20", 1,
                 LocalDateTime.of(2024, 5, 2, 10, 45), Duration.ofMinutes(15));
         SubTask subTask2 = new SubTask("Подзадача 21", "Описание 21", 1,
-                LocalDateTime.of(2024, 5, 2, 11, 0), Duration.ofMinutes(15));
+                LocalDateTime.of(2024, 5, 2, 11, 1), Duration.ofMinutes(15));
         taskManager.addEpic(epic);
         taskManager.addSubTask(subTask1);
         taskManager.addSubTask(subTask2);
@@ -459,7 +458,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         SubTask subTaskPriority3 = new SubTask("Подзадача 17", "Описание 17", 2,
                 LocalDateTime.of(2024, 5, 2, 10, 0), Duration.ofMinutes(15));
         SubTask subTaskPriority2 = new SubTask("Подзадача 18", "Описание 18", 2,
-                LocalDateTime.of(2024, 5, 2, 9, 45), Duration.ofMinutes(15));
+                LocalDateTime.of(2024, 5, 2, 11, 45), Duration.ofMinutes(15));
         taskManager.addTask(taskPriority1);
         taskManager.addEpic(epic);
         taskManager.addSubTask(subTaskPriority3);
@@ -469,7 +468,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         assertEquals(3, prioritizedTasks.size());
         assertEquals(taskPriority1, prioritizedTasks.getFirst());
-        assertEquals(subTaskPriority3, prioritizedTasks.getLast());
+        assertEquals(subTaskPriority2, prioritizedTasks.getLast());
     }
 
 
@@ -480,7 +479,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Task taskWithoutTime = new Task("Задача 14", "Описание 14");
         Epic epic = new Epic("Эпик 17", "Описание 17");
         SubTask subTaskPriority2 = new SubTask("Подзадача 19", "Описание 19", 3,
-                LocalDateTime.of(2024, 5, 2, 10, 30), Duration.ofMinutes(15));
+                LocalDateTime.of(2024, 5, 2, 10, 36), Duration.ofMinutes(15));
 
         taskManager.addTask(taskPriority1);
         taskManager.addTask(taskWithoutTime);

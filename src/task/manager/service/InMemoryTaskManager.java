@@ -196,9 +196,8 @@ public class InMemoryTaskManager implements TaskManager {
         LocalDateTime newEndInstant = newTask.getEndTime();
         boolean tasksCollide =  prioritizedTasks.stream()
                 .filter(task -> task.getId() != newTask.getId())
-                .anyMatch(task -> (newStartInstant.isBefore(task.getStartTime())
-                        && newEndInstant.isAfter(task.getStartTime())) || (task.getStartTime().isBefore(newStartInstant)
-                        && task.getEndTime().isAfter(newStartInstant)));
+                .anyMatch(task -> (!(newStartInstant.isAfter(task.getEndTime())
+                        || (newEndInstant.isBefore(task.getStartTime())))));
         if (tasksCollide) throw new ValidationException("Время задач пересекается!");
         return tasksCollide;
     }
