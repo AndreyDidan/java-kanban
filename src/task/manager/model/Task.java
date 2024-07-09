@@ -1,5 +1,8 @@
 package task.manager.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 public class Task {
@@ -8,17 +11,40 @@ public class Task {
     private String description;
     private StateTask stateTask;
 
-    public Task(int id, String name, String description, StateTask stateTask) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.stateTask = stateTask;
-    }
+    private LocalDateTime startTime;
+    private Duration duration;
+    private LocalDateTime endTime;
 
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
-        stateTask = StateTask.NEW;
+        this.stateTask = StateTask.NEW;
+        this.startTime = null;
+        this.duration = null;
+    }
+
+    public Task(int id, String name, String description, StateTask stateTask) {
+        this(name, description);
+        this.id = id;
+        this.stateTask = stateTask;
+        this.startTime = null;
+        this.duration = null;
+    }
+
+    public Task(String name, String description, LocalDateTime startTime, Duration duration) {
+        this(name,description);
+        this.stateTask = StateTask.NEW;
+        this.startTime = startTime;
+        this.duration = duration;
+        this.endTime = getEndTime();
+    }
+
+    public Task(int id, String name, String description, StateTask stateTask, LocalDateTime startTime, Duration duration) {
+        this(name, description, startTime, duration);
+        this.id = id;
+
+        this.stateTask = stateTask;
+        this.endTime = getEndTime();
     }
 
     public Integer getIdEpic() {
@@ -59,6 +85,26 @@ public class Task {
 
     public TaskType getType() {
         return TaskType.TASK;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration.toMinutes(), ChronoUnit.MINUTES);
     }
 
     @Override

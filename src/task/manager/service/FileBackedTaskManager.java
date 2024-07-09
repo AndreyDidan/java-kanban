@@ -33,7 +33,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     // Сохранение в файл
     private void save() {
         try (final BufferedWriter writer = new BufferedWriter(new FileWriter(file, UTF_8))) {
-            String titul = "id,type,name,status,description,epic\n";
+            String titul = "id,type,name,status,description,epic,startTime,duration\n";
             writer.write(titul);
             for (HashMap.Entry<Integer, Task> entry : tasks.entrySet()) {
                 writer.append(Converter.toString(entry.getValue()));
@@ -59,14 +59,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             reader.readLine();
             while (reader.ready()) {
                 String line = reader.readLine();
-
                 final Task task = Converter.fromString(line);
                 final int loadId = task.getId();
+
                 if (maxId < loadId) {
                     maxId = loadId;
                 }
+
                 if (task.getType() == TaskType.TASK) {
                     tasks.put(loadId, task);
+                    if (task.getDuration() != null) {
+                        prioritizedTasks.add(tasks.get(loadId));
+                    }
                 } else if (task.getType() == TaskType.EPIC) {
                     epics.put(loadId, (Epic) task);
                 } else if (task.getType() == TaskType.SUBTASK) {
@@ -74,6 +78,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     Epic epic = epics.get(task.getIdEpic());
                     epic.addSubTask(task.getId());
                     changeEpicState(epics.get(task.getIdEpic()));
+                    if (task.getDuration() != null) {
+                        prioritizedTasks.add(subTasks.get(loadId));
+                    }
                 }
             }
         } catch (IOException e) {
