@@ -9,6 +9,7 @@ import task.manager.service.TaskManager;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
 
@@ -65,5 +66,8 @@ public class Main {
         List<Task> history1 = taskManagerLoad.getHistory();
         System.out.println(history1);
         System.out.println(taskManagerLoad.getPrioritizedTask());
+        System.out.println(taskManagerLoad.getAllTasks());
+
+        System.out.println();
     }
 }

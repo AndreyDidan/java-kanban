@@ -3,6 +3,7 @@ package task.manager.model;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Epic extends Task {
 
@@ -23,11 +24,11 @@ public class Epic extends Task {
         return subTasksInEpic;
     }
 
-    public void addSubTask(int id) {
+    public void addSubTask(Integer id) {
         subTasksInEpic.add(Integer.valueOf(id));
     }
 
-    public void deleteSubTask(int id) {
+    public void deleteSubTask(Integer id) {
         subTasksInEpic.remove(Integer.valueOf(id));
     }
 

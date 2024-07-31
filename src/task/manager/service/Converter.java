@@ -6,7 +6,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class Converter {
-    protected static String toString(Task task) {
+    public static String toString(Task task) {
         Duration dur = task.getDuration();
         String s;
         if (dur == null) {
@@ -22,7 +22,7 @@ public class Converter {
         return s;
     }
 
-    protected static Task fromString(String value) {
+    public static Task fromString(String value) {
         try {
             final String[] update = value.split(",");
             LocalDateTime startTimeString = null;

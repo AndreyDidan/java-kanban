@@ -6,7 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 public class Task {
-    private int id;
+    private Integer id;
     private String name;
     private String description;
     private StateTask stateTask;
@@ -23,7 +23,7 @@ public class Task {
         this.duration = null;
     }
 
-    public Task(int id, String name, String description, StateTask stateTask) {
+    public Task(Integer id, String name, String description, StateTask stateTask) {
         this(name, description);
         this.id = id;
         this.stateTask = stateTask;
@@ -39,7 +39,7 @@ public class Task {
         this.endTime = getEndTime();
     }
 
-    public Task(int id, String name, String description, StateTask stateTask, LocalDateTime startTime, Duration duration) {
+    public Task(Integer id, String name, String description, StateTask stateTask, LocalDateTime startTime, Duration duration) {
         this(name, description, startTime, duration);
         this.id = id;
 
@@ -51,7 +51,7 @@ public class Task {
         return null;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

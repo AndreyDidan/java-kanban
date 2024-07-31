@@ -60,7 +60,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             while (reader.ready()) {
                 String line = reader.readLine();
                 final Task task = Converter.fromString(line);
-                final int loadId = task.getId();
+                final Integer loadId = task.getId();
 
                 if (maxId < loadId) {
                     maxId = loadId;
@@ -129,19 +129,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void deleteTask(int id) {
+    public void deleteTask(Integer id) {
         super.deleteTask(id);
         save();
     }
 
     @Override
-    public void deleteSubTask(int id) {
+    public void deleteSubTask(Integer id) {
         super.deleteSubTask(id);
         save();
     }
 
     @Override
-    public void deleteEpic(int id) {
+    public void deleteEpic(Integer id) {
         super.deleteEpic(id);
         save();
     }

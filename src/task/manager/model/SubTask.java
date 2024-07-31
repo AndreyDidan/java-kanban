@@ -5,20 +5,20 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class SubTask extends Task {
-    private int idEpic;
+    private Integer idEpic;
     private LocalDateTime endTime;
 
-    public SubTask(String name, String description, int idEpic) {
+    public SubTask(String name, String description, Integer idEpic) {
         super(name, description);
         this.idEpic = idEpic;
     }
 
-    public SubTask(String name, String description, StateTask stateTask, int idEpic, int id) {
+    public SubTask(String name, String description, StateTask stateTask, Integer idEpic, Integer id) {
         super(id, name, description, stateTask);
         this.idEpic = idEpic;
     }
 
-    public SubTask(String name, String description, int idEpic, LocalDateTime startTime, Duration duration) {
+    public SubTask(String name, String description, Integer idEpic, LocalDateTime startTime, Duration duration) {
         super(name, description, startTime, duration);
         this.idEpic = idEpic;
         this.setStartTime(startTime);
@@ -26,7 +26,7 @@ public class SubTask extends Task {
         this.endTime = getEndTime();
     }
 
-    public SubTask(String name, String description, StateTask stateTask, int idEpic, int id, LocalDateTime startTime,
+    public SubTask(String name, String description, StateTask stateTask, Integer idEpic, Integer id, LocalDateTime startTime,
                    Duration duration) {
         super(id, name, description, stateTask, startTime, duration);
         this.idEpic = idEpic;
@@ -35,7 +35,7 @@ public class SubTask extends Task {
         this.endTime = getEndTime();
     }
 
-    public void setIdEpic(int idEpic) {
+    public void setIdEpic(Integer idEpic) {
         this.idEpic = idEpic;
     }
 

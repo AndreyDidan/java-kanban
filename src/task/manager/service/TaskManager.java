@@ -23,11 +23,11 @@ public interface TaskManager {
     void updateEpic(Epic updateEpic);
 
     //Удаление по идентификатору
-    void deleteTask(int id);
+    void deleteTask(Integer id);
 
-    void deleteSubTask(int id);
+    void deleteSubTask(Integer id);
 
-    void deleteEpic(int id);
+    void deleteEpic(Integer id);
 
     // удаление всех задач
     void deleteAllTasks();
@@ -37,14 +37,14 @@ public interface TaskManager {
     void deleteAllSubTask();
 
     // Получение задач по идентификатору
-    Task getTaskId(int id);
+    Task getTaskId(Integer id);
 
-    Epic getEpicId(int id);
+    Epic getEpicId(Integer id);
 
-    SubTask getSubTaskId(int id);
+    SubTask getSubTaskId(Integer id);
 
     // получение списка задач n-го эпика
-    ArrayList<SubTask> getSubTasksInEpic(int idEpic);
+    ArrayList<SubTask> getSubTasksInEpic(Integer idEpic);
 
     // получение списка всех задач
     ArrayList<Task> getAllTasks();
@@ -56,4 +56,6 @@ public interface TaskManager {
     List<Task> getHistory();
 
     List<Task> getPrioritizedTask();
+
+    boolean isCheckTaskTime(Task task);
 }
