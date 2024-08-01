@@ -59,29 +59,13 @@ public class SubTaskHandler extends BaseHttpHandler {
         String path = exchange.getRequestURI().getPath();
         String[] pathParts = path.split("/");
 
-
-        if (pathParts.length == 2 && strIsSubTasks(pathParts[1])) {
-            ArrayList<SubTask> subTaskList = this.taskManager.getAllSubtasks();
-            sendText(exchange, gson.toJson(subTaskList));
-        } else if (pathParts.length == 3 && strIsSubTasks(pathParts[1]) && strIsId(pathParts[2])) {
-            int id = Integer.parseInt(pathParts[2]);
-            sendText(exchange, String.valueOf(this.taskManager.getSubTaskId(id)));
-        } else {
-            sendNotFoundEndpoint(exchange, "405");
-        }
-
-
-
-        /*String path = exchange.getRequestURI().getPath();
-        String[] pathParts = path.split("/");
-
         if (pathParts.length == 2) {
             sendText(exchange, gson.toJson(taskManager.getAllSubtasks()));
         } else if (pathParts.length == 3) {
             Integer id = Integer.parseInt(pathParts[2]);
             if (isId(id)) {
-                SubTask subTask = taskManager.getSubTaskId(id);
-                sendText(exchange, gson.toJson(subTask));
+                SubTask task = taskManager.getSubTaskId(id);
+                sendText(exchange, gson.toJson(task));
             } else {
                 sendNotFoundId(exchange, "Такой задачи неусещствует id = " + id);
             }
@@ -89,11 +73,7 @@ public class SubTaskHandler extends BaseHttpHandler {
             exchange.sendResponseHeaders(500, 0);
             exchange.getResponseBody().write("Неизвестная ошибка".getBytes());
             exchange.close();
-        }*/
-    }
-
-    protected boolean strIsEpics(String target) {
-        return target.equals("epics");
+        }
     }
 
     @Override
@@ -101,91 +81,48 @@ public class SubTaskHandler extends BaseHttpHandler {
 
         String path = exchange.getRequestURI().getPath();
         String[] pathParts = path.split("/");
-
-        if (pathParts.length == 2 && strIsEpics(pathParts[1])) {
-            String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-            JsonElement jsonElement = JsonParser.parseString(body);
-
-            if (jsonElement.isJsonObject()) {
-                JsonObject jsonObject = jsonElement.getAsJsonObject();
-
-                JsonElement id = jsonObject.get("id");
-                JsonElement name = jsonObject.get("name");
-                JsonElement description = jsonObject.get("description");
-
-                if (name == null || description == null) {
-                    sendHasData(exchange,"Не заполнены обязательные поля");
-                } else {
-                    String nameValue = name.getAsString();
-                    String descriptionValue = description.getAsString();
-
-                    Epic epic = new Epic(nameValue, descriptionValue);
-
-                    if (id != null && id.getAsInt() != 0) {
-                        epic.setId(id.getAsInt());
-                        this.taskManager.updateEpic(epic);
-                    } else {
-                        this.taskManager.addEpic(epic);
-                    }
-                    sendTextPost(exchange, "может");
-                }
-            } else {
-                sendHasData(exchange, "Тело запроса не в формате json");
-            }
-        } else {
-            sendNotFoundEndpoint(exchange, "нет эндп");
-        }
-
-
-
-
-
-
-
-        /*String path = exchange.getRequestURI().getPath();
-        String[] pathParts = path.split("/");
         InputStream inputStream = exchange.getRequestBody();
         String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        SubTask subTask = gson.fromJson(body, SubTask.class);
-        SubTask newSubTask;
+        SubTask task = gson.fromJson(body, SubTask.class);
+        SubTask newTask;
 
         if (pathParts.length == 3) {
             Integer id = Integer.parseInt(pathParts[2]);
             if (id > 0) {
                 if (isId(id)) {
-                    if (subTask.getStartTime() != null && taskManager.isCheckTaskTime(subTask)) {
-                        sendHasInteractions(exchange, "Подзадачи пересекаются");
-                    } else if (subTask.getStartTime() != null && !taskManager.isCheckTaskTime(subTask)) {
-                        newSubTask = new SubTask(subTask.getName(), subTask.getDescription(), subTask.getStateTask(),
-                                subTask.getIdEpic(), id, subTask.getStartTime(), subTask.getDuration());
-                        taskManager.updateSubTask(newSubTask);
-                        sendTextPost(exchange, gson.toJson(newSubTask));
+                    if (task.getStartTime() != null && taskManager.isCheckTaskTime(task)) {
+                        sendHasInteractions(exchange, "Задачи пересекаются");
+                    } else if (task.getStartTime() != null && !taskManager.isCheckTaskTime(task)) {
+                        newTask = new SubTask(task.getName(), task.getDescription(), task.getStateTask(),
+                                task.getIdEpic(), task.getId(), task.getStartTime(), task.getDuration());
+                        taskManager.updateSubTask(newTask);
+                        sendTextPost(exchange, gson.toJson(newTask));
                     } else {
-                        newSubTask = new SubTask(subTask.getName(), subTask.getDescription(), subTask.getStateTask(),
-                                subTask.getIdEpic(), id);
-                        taskManager.updateSubTask(newSubTask);
-                        sendTextPost(exchange, gson.toJson(newSubTask));
+                        newTask = new SubTask(task.getName(), task.getDescription(), task.getStateTask(),
+                                task.getIdEpic(), task.getId());
+                        taskManager.updateSubTask(newTask);
+                        sendTextPost(exchange, gson.toJson(newTask));
                     }
                 } else {
-                    sendNotFoundId(exchange, "Такой подзадачи неусещствует id = " + id);
+                    sendNotFoundId(exchange, "Такой задачи неусещствует id = " + id);
                 }
             }
         } else if (pathParts.length == 2) {
-            if (subTask.getStartTime() != null && taskManager.isCheckTaskTime(subTask)) {
-                sendHasInteractions(exchange, "Подзадачи пересекаются");
-            } else if (subTask.getStartTime() != null && !taskManager.isCheckTaskTime(subTask)) {
-                newSubTask = new SubTask(subTask.getName(), subTask.getDescription(), subTask.getIdEpic(),
-                        subTask.getStartTime(), subTask.getDuration());
-                taskManager.addSubTask(newSubTask);
-                sendTextPost(exchange, gson.toJson(newSubTask));
+            if (task.getStartTime() != null && taskManager.isCheckTaskTime(task)) {
+                sendHasInteractions(exchange, "Задачи пересекаются");
+            } else if (task.getStartTime() != null && !taskManager.isCheckTaskTime(task)) {
+                newTask = new SubTask(task.getName(), task.getDescription(), task.getIdEpic(), task.getStartTime(),
+                        task.getDuration());
+                taskManager.addSubTask(newTask);
+                sendTextPost(exchange, gson.toJson(newTask));
             } else {
-                newSubTask = new SubTask(subTask.getName(), subTask.getDescription(), subTask.getIdEpic());
-                taskManager.addSubTask(newSubTask);
-                sendTextPost(exchange, gson.toJson(newSubTask));
+                newTask = new SubTask(task.getName(), task.getDescription(), task.getIdEpic());
+                taskManager.addSubTask(newTask);
+                sendTextPost(exchange, gson.toJson(newTask));
             }
         } else {
             exchange.sendResponseHeaders(500, 0);
-            exchange.getResponseBody().write("Неизвестная ошибка".getBytes());
+            exchange.getResponseBody().write("Internal Server Error".getBytes());
             exchange.close();
         }
     }
@@ -198,19 +135,19 @@ public class SubTaskHandler extends BaseHttpHandler {
 
         if (pathParts.length == 2) {
             taskManager.deleteAllSubTask();
-            sendTextDelete(exchange, "Список подзадач очищен.");
+            sendTextDelete(exchange, "Список задач очищен.");
         } else if (pathParts.length == 3) {
             Integer id = Integer.parseInt(pathParts[2]);
             if (isId(id)) {
                 taskManager.deleteSubTask(id);
-                sendTextDelete(exchange, "Подзадача id = " + id + " удалена.");
+                sendTextDelete(exchange, "Задача id = " + id + " удалена.");
             } else {
-                sendNotFoundId(exchange, "Такой подзадачи нет id = " + id);
+                sendNotFoundId(exchange, "Такой задачи нет id = " + id);
             }
         } else {
             exchange.sendResponseHeaders(500, 0);
             exchange.getResponseBody().write("Internal Server Error".getBytes());
             exchange.close();
-        }*/
+        }
     }
 }

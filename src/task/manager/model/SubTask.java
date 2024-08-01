@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class SubTask extends Task {
     private Integer idEpic;
-    private LocalDateTime endTime;
+    //private LocalDateTime endTime;
 
     public SubTask(String name, String description, Integer idEpic) {
         super(name, description);
@@ -23,7 +23,7 @@ public class SubTask extends Task {
         this.idEpic = idEpic;
         this.setStartTime(startTime);
         this.setDuration(duration);
-        this.endTime = getEndTime();
+        super.getEndTime();
     }
 
     public SubTask(String name, String description, StateTask stateTask, Integer idEpic, Integer id, LocalDateTime startTime,
@@ -32,7 +32,7 @@ public class SubTask extends Task {
         this.idEpic = idEpic;
         this.setStartTime(startTime);
         this.setDuration(duration);
-        this.endTime = getEndTime();
+        super.getEndTime();
     }
 
     public void setIdEpic(Integer idEpic) {
