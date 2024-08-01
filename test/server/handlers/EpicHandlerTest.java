@@ -38,7 +38,7 @@ class EpicHandlerTest {
 
 
     @Test
-    void testHandlePostRequestAddNewTask() throws IOException,InterruptedException {
+    void testHandlePostRequestAddNewEpic() throws IOException,InterruptedException {
 
         String taskJson = "{ \"name\": \"Task1\", "+
                 "\"description\": \"Description1\" " +
@@ -59,7 +59,7 @@ class EpicHandlerTest {
         assertEquals(201, response.statusCode());
 
         ArrayList<Epic> tasksFromManager = tm.getAllEpics();
-        Task task1 = tm.getTaskId(1);
+        Epic task1 = tm.getEpicId(1);
 
         assertNotNull(tasksFromManager, "Задачи не возвращаются");
         assertEquals(1, tasksFromManager.size(), "Некорректное количество задач");
@@ -68,9 +68,9 @@ class EpicHandlerTest {
     }
 
     @Test
-    void testHandleGetAllTasks() throws IOException,InterruptedException {
-        tm.addTask(new Epic("Task1", "Desc1"));
-        tm.addTask(new Epic("Task2", "Desc2"));
+    void testHandleGetAllEpics() throws IOException,InterruptedException {
+        tm.addEpic(new Epic("Task1", "Desc1"));
+        tm.addEpic(new Epic("Task2", "Desc2"));
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -82,12 +82,27 @@ class EpicHandlerTest {
         assertEquals(200, response.statusCode(), "Код ответа не совпадает");
     }
 
+    @Test
+    void testHandleGetOneEpic() throws IOException,InterruptedException {
+        tm.addEpic(new Epic("Task1", "Desc1"));
+        tm.addEpic(new Epic("Task2", "Desc2"));
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/epics/1"))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, response.statusCode(), "Код ответа не совпадает");
+    }
+
 
     @Test
-    void testHandleDeleteRequestDeleteTask() throws IOException,InterruptedException {
+    void testHandleDeleteRequestDeleteEpic() throws IOException,InterruptedException {
 
-        Task task1 = new Epic("Task1", "Desc1");
-        Task task2 = new Epic("Task1", "Desc1");
+        Epic task1 = new Epic("Task1", "Desc1");
+        Epic task2 = new Epic("Task1", "Desc1");
         tm.addTask(task1);
         tm.addTask(task2);
 
@@ -98,8 +113,27 @@ class EpicHandlerTest {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(204, response.statusCode(), "Код ответа не совпадает");
-        assertFalse(tm.getAllTasks().contains(task1));
-        assertTrue(tm.getAllTasks().contains(task2));
+        assertFalse(tm.getAllEpics().contains(task1));
+        assertTrue(tm.getAllEpics().contains(task2));
+    }
+
+    @Test
+    void testHandleDeleteRequestDeleteAllEpics() throws IOException,InterruptedException {
+
+        Epic task1 = new Epic("Task1", "Desc1");
+        Epic task2 = new Epic("Task1", "Desc1");
+        tm.addTask(task1);
+        tm.addTask(task2);
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/epics/"))
+                .DELETE()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(204, response.statusCode(), "Код ответа не совпадает");
+        assertFalse(tm.getAllEpics().contains(task1));
+        assertFalse(tm.getAllEpics().contains(task2));
     }
 
 }

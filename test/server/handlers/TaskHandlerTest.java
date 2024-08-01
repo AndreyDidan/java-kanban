@@ -1,5 +1,6 @@
 package server.handlers;
 
+import task.manager.model.Epic;
 import task.manager.model.Task;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,6 +82,20 @@ class TaskHandlerTest {
         assertEquals(200, response.statusCode(), "Код ответа не совпадает");
     }
 
+    @Test
+    void testHandleGetOneTask() throws IOException,InterruptedException {
+        tm.addTask(new Epic("Task1", "Desc1"));
+        tm.addTask(new Epic("Task2", "Desc2"));
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/tasks/1"))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, response.statusCode(), "Код ответа не совпадает");
+    }
 
     @Test
     void testHandleDeleteRequestDeleteTask() throws IOException,InterruptedException {
@@ -99,5 +114,24 @@ class TaskHandlerTest {
         assertEquals(204, response.statusCode(), "Код ответа не совпадает");
         assertFalse(tm.getAllTasks().contains(task1));
         assertTrue(tm.getAllTasks().contains(task2));
+    }
+
+    @Test
+    void testHandleDeleteRequestDeleteAllTasks() throws IOException,InterruptedException {
+
+        Task task1 = new Task("Task1", "Desc1");
+        Task task2 = new Task("Task1", "Desc1");
+        tm.addTask(task1);
+        tm.addTask(task2);
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/tasks/"))
+                .DELETE()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(204, response.statusCode(), "Код ответа не совпадает");
+        assertFalse(tm.getAllTasks().contains(task1));
+        assertFalse(tm.getAllTasks().contains(task2));
     }
 }
