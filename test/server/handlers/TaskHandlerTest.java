@@ -84,8 +84,8 @@ class TaskHandlerTest {
 
     @Test
     void testHandleGetOneTask() throws IOException,InterruptedException {
-        tm.addTask(new Epic("Task1", "Desc1"));
-        tm.addTask(new Epic("Task2", "Desc2"));
+        tm.addTask(new Task("Task1", "Desc1"));
+        tm.addTask(new Task("Task2", "Desc2"));
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
