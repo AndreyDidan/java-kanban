@@ -49,7 +49,7 @@ class EpicHandlerTest {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/tasks"))
+                .uri(URI.create("http://localhost:8080/epics"))
                 .POST(HttpRequest.BodyPublishers.ofString(taskJson))
                 .build();
 
@@ -74,7 +74,7 @@ class EpicHandlerTest {
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/tasks"))
+                .uri(URI.create("http://localhost:8080/epics"))
                 .GET()
                 .build();
 
@@ -93,7 +93,7 @@ class EpicHandlerTest {
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/tasks/"+task1.getId()))
+                .uri(URI.create("http://localhost:8080/epics/"+task1.getId()))
                 .DELETE()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());

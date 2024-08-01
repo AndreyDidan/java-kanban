@@ -22,6 +22,10 @@ import com.google.gson.JsonObject;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+class UserListTypeToken extends TypeToken<Epic> {
+    // здесь ничего не нужно реализовывать
+}
+
 public class EpicHandler extends BaseHttpHandler {
 
     Gson gson;
@@ -80,23 +84,33 @@ public class EpicHandler extends BaseHttpHandler {
         String[] pathParts = path.split("/");
         InputStream inputStream = exchange.getRequestBody();
         String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        Epic task = gson.fromJson(body, Epic.class);
+        //Epic task = gson.fromJson(body, Epic.class);
         Epic newTask;
 
+        Epic task = gson.fromJson(body, new UserListTypeToken().getType());
+        Integer id = task.getId();
+        String name = task.getName();
+        String description = task.getDescription();
+        LocalDateTime startTime = task.getStartTime();
+        Duration duration = task.getDuration();
+
+        Epic epic1 = new Epic(name, description, startTime, duration);
+        Epic epic2 = new Epic(name, description);
+
+
         if (pathParts.length == 3) {
-            Integer id = Integer.parseInt(pathParts[2]);
+            //Integer id = Integer.parseInt(pathParts[2]);
             if (id > 0) {
                 if (isId(id)) {
-                    if (task.getStartTime() != null && taskManager.isCheckTaskTime(task)) {
+                    if (startTime != null && taskManager.isCheckTaskTime(epic1)) {
                         sendHasInteractions(exchange, "Задачи пересекаются");
-                    } else if (task.getStartTime() != null && !taskManager.isCheckTaskTime(task)) {
-                        newTask = new Epic(task.getName(), task.getDescription(), task.getStartTime(), task.getDuration());
-                        taskManager.updateEpic(newTask);
-                        sendTextPost(exchange, gson.toJson(newTask));
+                    } else if (startTime != null && !taskManager.isCheckTaskTime(epic1)) {
+                        taskManager.updateEpic(epic1);
+                        sendTextPost(exchange, gson.toJson(epic1));
                     } else {
-                        newTask = new Epic(task.getName(), task.getDescription());
-                        taskManager.updateEpic(newTask);
-                        sendTextPost(exchange, gson.toJson(newTask));
+                        //newTask = new Epic(task.getName(), task.getDescription());
+                        taskManager.updateEpic(epic2);
+                        sendTextPost(exchange, gson.toJson(epic2));
                     }
                 } else {
                     sendNotFoundId(exchange, "Такой задачи неусещствует id = " + id);
@@ -105,14 +119,14 @@ public class EpicHandler extends BaseHttpHandler {
         } else if (pathParts.length == 2) {
             if (task.getStartTime() != null && taskManager.isCheckTaskTime(task)) {
                 sendHasInteractions(exchange, "Задачи пересекаются");
-            } else if (task.getStartTime() != null && !taskManager.isCheckTaskTime(task)) {
-                newTask = new Epic(task.getName(), task.getDescription(), task.getStartTime(), task.getDuration());
-                taskManager.addEpic(newTask);
-                sendTextPost(exchange, gson.toJson(newTask));
+            } else if (startTime != null && !taskManager.isCheckTaskTime(epic1)) {
+                //newTask = new Epic(task.getName(), task.getDescription(), task.getStartTime(), task.getDuration());
+                taskManager.addEpic(epic1);
+                sendTextPost(exchange, gson.toJson(epic1));
             } else {
-                newTask = new Epic(task.getName(), task.getDescription());
-                taskManager.addEpic(newTask);
-                sendTextPost(exchange, gson.toJson(newTask));
+                //newTask = new Epic(task.getName(), task.getDescription());
+                taskManager.addEpic(epic2);
+                sendTextPost(exchange, gson.toJson(epic2));
             }
         } else {
             exchange.sendResponseHeaders(500, 0);
