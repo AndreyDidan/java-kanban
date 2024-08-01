@@ -22,9 +22,9 @@ import com.google.gson.JsonObject;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-class UserListTypeToken extends TypeToken<Epic> {
+/*class UserListTypeToken extends TypeToken<Epic> {
     // здесь ничего не нужно реализовывать
-}
+}*/
 
 public class EpicHandler extends BaseHttpHandler {
 
@@ -87,7 +87,7 @@ public class EpicHandler extends BaseHttpHandler {
         //Epic task = gson.fromJson(body, Epic.class);
         Epic newTask;
 
-        Epic task = gson.fromJson(body, new UserListTypeToken().getType());
+        Epic task = gson.fromJson(body, Epic.class);//new UserListTypeToken().getType());
         Integer id = task.getId();
         String name = task.getName();
         String description = task.getDescription();
