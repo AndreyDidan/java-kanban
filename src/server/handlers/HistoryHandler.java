@@ -3,7 +3,6 @@ package server.handlers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import server.adapters.DurationAdapter;
 import server.adapters.LocalDateTimeAdapter;
 import task.manager.service.TaskManager;
@@ -39,17 +38,4 @@ public class HistoryHandler extends BaseHttpHandler {
             sendError(exchange, e.getMessage());
         }
     }
-
-    /*@Override
-    public void handle(HttpExchange exchange) throws IOException {
-        try (exchange) {
-            if (exchange.getRequestMethod().equals("GET")) {
-                sendGet(exchange, gson.toJson(super.taskManager.getHistory()));
-            } else {
-                sendNotMethod(exchange);
-            }
-        } catch (Exception e) {
-            sendError(exchange, e.getMessage());
-        }
-    }*/
 }

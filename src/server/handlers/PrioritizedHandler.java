@@ -3,16 +3,12 @@ package server.handlers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import server.adapters.DurationAdapter;
 import server.adapters.LocalDateTimeAdapter;
-import task.manager.model.Task;
 import task.manager.service.TaskManager;
-
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 public class PrioritizedHandler extends BaseHttpHandler {
 
@@ -40,10 +36,5 @@ public class PrioritizedHandler extends BaseHttpHandler {
         } catch (Exception e) {
             sendError(exchange, e.getMessage());
         }
-        /*} else {
-            exchange.sendResponseHeaders(500, 0);
-            exchange.getResponseBody().write("Неизвестная ошибка".getBytes());
-            exchange.close();
-        }*/
     }
 }
