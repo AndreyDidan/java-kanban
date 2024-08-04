@@ -9,6 +9,7 @@ import task.manager.service.TaskManager;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
 
@@ -65,5 +66,10 @@ public class Main {
         List<Task> history1 = taskManagerLoad.getHistory();
         System.out.println(history1);
         System.out.println(taskManagerLoad.getPrioritizedTask());
+
+        ArrayList<SubTask> podzad = taskManagerLoad.getAllSubtasks();
+        System.out.println(podzad);
+        taskManagerLoad.deleteSubTask(3);
+        System.out.println(taskManagerLoad.getAllSubtasks());
     }
 }

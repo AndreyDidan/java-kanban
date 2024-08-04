@@ -56,4 +56,5 @@ public interface TaskManager {
     List<Task> getHistory();
 
     List<Task> getPrioritizedTask();
+    boolean isCheckTaskTime(Task newTask);
 }
