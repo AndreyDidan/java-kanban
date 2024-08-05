@@ -40,8 +40,12 @@ public class PrioritizedHandler extends BaseHttpHandler {
     }
 
     @Override
-    protected void handlePostRequest(HttpExchange httpExchange) throws IOException {}
+    protected void handlePostRequest(HttpExchange httpExchange) throws IOException {
+
+    }
 
     @Override
-    protected void handleDeleteRequest(HttpExchange httpExchange) throws IOException {}
+    protected void handleDeleteRequest(HttpExchange httpExchange) throws IOException {
+
+    }
 }
