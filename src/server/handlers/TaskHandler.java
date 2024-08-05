@@ -2,6 +2,8 @@ package server.handlers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import server.adapters.DurationAdapter;
 import server.adapters.LocalDateTimeAdapter;
@@ -70,18 +72,21 @@ public class TaskHandler extends BaseHttpHandler {
     @Override
     protected void handlePostRequest(HttpExchange exchange) throws IOException {
 
-        try (exchange) {
-            String path = exchange.getRequestURI().getPath();
-            String[] pathParts = path.split("/");
-            InputStream inputStream = exchange.getRequestBody();
-            String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-            Task task = gson.fromJson(body, Task.class);
-            Task newTask;
+        String path = exchange.getRequestURI().getPath();
+        String[] pathParts = path.split("/");
+        InputStream inputStream = exchange.getRequestBody();
+        String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        Task task = gson.fromJson(body, Task.class);
+        JsonElement jsonElement = JsonParser.parseString(body);
+        Task newTask;
 
-            if (pathParts.length == 3) {
-                int id = Integer.parseInt(pathParts[2]);
-                if (id > 0) {
-                    if (isId(id)) {
+        if (pathParts.length == 3) {
+            int id = Integer.parseInt(pathParts[2]);
+            if (id > 0) {
+                if (isId(id)) {
+                    if (!jsonElement.isJsonObject()) {
+                        sendHasData(exchange, "Запрос не в формае json");
+                    } else {
                         if (task.getStartTime() != null && taskManager.isCheckTaskTime(task)) {
                             sendHasInteractions(exchange, "Задачи пересекаются");
                         } else if (task.getStartTime() != null && !taskManager.isCheckTaskTime(task)) {
@@ -94,11 +99,17 @@ public class TaskHandler extends BaseHttpHandler {
                             taskManager.updateTask(newTask);
                             sendTextPost(exchange, gson.toJson(newTask));
                         }
-                    } else {
-                        sendNotFoundId(exchange, "Такой задачи неусещствует id = " + id);
                     }
+                } else {
+                    sendNotFoundId(exchange, "Такой задачи неусещствует id = " + id);
                 }
-            } else if (pathParts.length == 2) {
+            } else {
+                sendHasData(exchange, "id не может быть не числом и не может быть меньше 0.");
+            }
+        } else if (pathParts.length == 2) {
+            if (!jsonElement.isJsonObject()) {
+                sendHasData(exchange, "Запрос не в формае json");
+            } else {
                 if (task.getStartTime() != null && taskManager.isCheckTaskTime(task)) {
                     sendHasInteractions(exchange, "Задачи пересекаются");
                 } else if (task.getStartTime() != null && !taskManager.isCheckTaskTime(task)) {
@@ -110,13 +121,11 @@ public class TaskHandler extends BaseHttpHandler {
                     taskManager.addTask(newTask);
                     sendTextPost(exchange, gson.toJson(newTask));
                 }
-            } else {
-                exchange.sendResponseHeaders(500, 0);
-                exchange.getResponseBody().write("Неизвестная ошибка".getBytes());
-                exchange.close();
             }
-        } catch (Exception e) {
-            sendError(exchange, e.getMessage());
+        } else {
+            exchange.sendResponseHeaders(500, 0);
+            exchange.getResponseBody().write("Неизвестная ошибка".getBytes());
+            exchange.close();
         }
     }
 
@@ -132,11 +141,15 @@ public class TaskHandler extends BaseHttpHandler {
                 sendTextDelete(exchange, "Список задач очищен.");
             } else if (pathParts.length == 3) {
                 int id = Integer.parseInt(pathParts[2]);
-                if (isId(id)) {
-                    taskManager.deleteTask(id);
-                    sendTextDelete(exchange, "Задача id = " + id + " удалена.");
+                if (id > 0) {
+                    if (isId(id)) {
+                        taskManager.deleteTask(id);
+                        sendTextDelete(exchange, "Задача id = " + id + " удалена.");
+                    } else {
+                        sendNotFoundId(exchange, "Такой задачи нет id = " + id);
+                    }
                 } else {
-                    sendNotFoundId(exchange, "Такой задачи нет id = " + id);
+                    sendHasData(exchange, "id не может быть не числом и не может быть меньше 0.");
                 }
             } else {
                 exchange.sendResponseHeaders(500, 0);

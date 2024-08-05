@@ -1,5 +1,7 @@
 package server.handlers;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import server.adapters.DurationAdapter;
 import server.adapters.LocalDateTimeAdapter;
@@ -70,18 +72,21 @@ public class SubTaskHandler extends BaseHttpHandler {
     @Override
     protected void handlePostRequest(HttpExchange exchange) throws IOException {
 
-        try {
-            String path = exchange.getRequestURI().getPath();
-            String[] pathParts = path.split("/");
-            InputStream inputStream = exchange.getRequestBody();
-            String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-            SubTask task = gson.fromJson(body, SubTask.class);
-            SubTask newTask;
+        String path = exchange.getRequestURI().getPath();
+        String[] pathParts = path.split("/");
+        InputStream inputStream = exchange.getRequestBody();
+        String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        SubTask task = gson.fromJson(body, SubTask.class);
+        JsonElement jsonElement = JsonParser.parseString(body);
+        SubTask newTask;
 
-            if (pathParts.length == 3) {
-                int id = Integer.parseInt(pathParts[2]);
-                if (id > 0) {
-                    if (isId(id)) {
+        if (pathParts.length == 3) {
+            int id = Integer.parseInt(pathParts[2]);
+            if (id > 0) {
+                if (isId(id)) {
+                    if (!jsonElement.isJsonObject()) {
+                        sendHasData(exchange, "Запрос не в формае json");
+                    } else {
                         if (task.getStartTime() != null && taskManager.isCheckTaskTime(task)) {
                             sendHasInteractions(exchange, "Задачи пересекаются");
                         } else if (task.getStartTime() != null && !taskManager.isCheckTaskTime(task)) {
@@ -95,30 +100,32 @@ public class SubTaskHandler extends BaseHttpHandler {
                             taskManager.updateSubTask(newTask);
                             sendTextPost(exchange, gson.toJson(newTask));
                         }
-                    } else {
-                        sendNotFoundId(exchange, "Такой задачи неусещствует id = " + id);
                     }
-                }
-            } else if (pathParts.length == 2) {
-                if (task.getStartTime() != null && taskManager.isCheckTaskTime(task)) {
-                    sendHasInteractions(exchange, "Задачи пересекаются");
-                } else if (task.getStartTime() != null && !taskManager.isCheckTaskTime(task)) {
-                    newTask = new SubTask(task.getName(), task.getDescription(), task.getIdEpic(), task.getStartTime(),
-                            task.getDuration());
-                    taskManager.addSubTask(newTask);
-                    sendTextPost(exchange, gson.toJson(newTask));
+
+
                 } else {
-                    newTask = new SubTask(task.getName(), task.getDescription(), task.getIdEpic());
-                    taskManager.addSubTask(newTask);
-                    sendTextPost(exchange, gson.toJson(newTask));
+                    sendNotFoundId(exchange, "Такой задачи неусещствует id = " + id);
                 }
             } else {
-                exchange.sendResponseHeaders(500, 0);
-                exchange.getResponseBody().write("Internal Server Error".getBytes());
-                exchange.close();
+                sendHasData(exchange, "id не может быть не числом и не может быть меньше 0.");
             }
-        } catch (Exception e) {
-            sendError(exchange, e.getMessage());
+        } else if (pathParts.length == 2) {
+            if (task.getStartTime() != null && taskManager.isCheckTaskTime(task)) {
+                sendHasInteractions(exchange, "Задачи пересекаются");
+            } else if (task.getStartTime() != null && !taskManager.isCheckTaskTime(task)) {
+                newTask = new SubTask(task.getName(), task.getDescription(), task.getIdEpic(), task.getStartTime(),
+                        task.getDuration());
+                taskManager.addSubTask(newTask);
+                sendTextPost(exchange, gson.toJson(newTask));
+            } else {
+                newTask = new SubTask(task.getName(), task.getDescription(), task.getIdEpic());
+                taskManager.addSubTask(newTask);
+                sendTextPost(exchange, gson.toJson(newTask));
+            }
+        } else {
+            exchange.sendResponseHeaders(500, 0);
+            exchange.getResponseBody().write("Internal Server Error".getBytes());
+            exchange.close();
         }
     }
 

@@ -101,7 +101,7 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
-        return startTime.plus(duration.toMinutes(), ChronoUnit.MINUTES);
+        return startTime.plusMinutes(duration.toMinutes());
     }
 
     @Override
