@@ -37,12 +37,12 @@ public class TaskHandlerTest {
         manager.deleteAllTasks();
         manager.deleteAllSubTask();
         manager.deleteAllEpics();
-        HttpTaskServer.start();
+        taskServer.start();
     }
 
     @AfterEach
     public void shutDown() {
-        HttpTaskServer.stop(0);
+        taskServer.stop(0);
     }
 
     @Test

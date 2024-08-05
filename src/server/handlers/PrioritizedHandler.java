@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 public class PrioritizedHandler extends BaseHttpHandler {
 
-    Gson gson;
+    private final Gson gson;
 
     public PrioritizedHandler(TaskManager taskManager) {
         super(taskManager);
@@ -28,13 +28,20 @@ public class PrioritizedHandler extends BaseHttpHandler {
         String[] pathParts = path.split("/");
 
         try (exchange) {
-            if (pathParts.length == 2) {
-                sendText(exchange, gson.toJson(taskManager.getPrioritizedTask()));
+            if (pathParts.length == 2 && pathParts[1].equals("prioritized")) {
+                sendResponse(exchange, gson.toJson(taskManager.getPrioritizedTask()), 200);
             } else {
-                sendNotFoundEndpoint(exchange, "Данный меод не реализован, используйте методы указанные в задании");
+                sendResponse(exchange, "Данный меод не реализован, используйте методы указанные в задании",
+                        405);
             }
         } catch (Exception e) {
-            sendError(exchange, e.getMessage());
+            sendResponse(exchange, e.getMessage(), 500);
         }
     }
+
+    @Override
+    protected void handlePostRequest(HttpExchange httpExchange) throws IOException {}
+
+    @Override
+    protected void handleDeleteRequest(HttpExchange httpExchange) throws IOException {}
 }

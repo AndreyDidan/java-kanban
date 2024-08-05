@@ -18,7 +18,7 @@ import java.io.InputStream;
 
 public class EpicHandler extends BaseHttpHandler {
 
-    Gson gson;
+    private final Gson gson;
 
     public EpicHandler(TaskManager taskManager) {
         super(taskManager);
@@ -49,29 +49,36 @@ public class EpicHandler extends BaseHttpHandler {
             String path = exchange.getRequestURI().getPath();
             String[] pathParts = path.split("/");
 
-            if (pathParts.length == 2) {
-                sendText(exchange, gson.toJson(taskManager.getAllEpics()));
-            } else if (pathParts.length == 3) {
+            if (pathParts.length == 2 && pathParts[1].equals("epics")) {
+                sendResponse(exchange, gson.toJson(taskManager.getAllEpics()), 200);
+            } else if (pathParts.length == 3 && pathParts[1].equals("epics")) {
                 int id = Integer.parseInt(pathParts[2]);
-                if (isId(id)) {
-                    Epic task = taskManager.getEpicId(id);
-                    sendText(exchange, gson.toJson(task));
+                if (isInteger(pathParts[2])) {
+                    if (isId(id)) {
+                        Epic task = taskManager.getEpicId(id);
+                        sendResponse(exchange, gson.toJson(task), 200);
+                    } else {
+                        sendResponse(exchange, "Такой задачи неусещствует id = " + id, 404);
+                    }
                 } else {
-                    sendNotFoundId(exchange, "Такой задачи неусещствует id = " + id);
+                    sendResponse(exchange, "id должен быть числом", 405);
                 }
-            } else if (pathParts.length == 4) {
-
+            } else if (pathParts.length == 4 && pathParts[1].equals("epics") && pathParts[3].equals("subtasks")) {
                 int id = Integer.parseInt(pathParts[2]);
-                if (isId(id)) {
-                    sendText(exchange, gson.toJson(taskManager.getSubTasksInEpic(id)));
+                if (isInteger(pathParts[2])) {
+                    if (isId(id)) {
+                        sendResponse(exchange, gson.toJson(taskManager.getSubTasksInEpic(id)), 200);
+                    }
+                } else {
+                    sendResponse(exchange, "Такого эпика неусещствует id = " + id, 404);
                 }
             } else {
-                exchange.sendResponseHeaders(500, 0);
-                exchange.getResponseBody().write("Неизвестная ошибка".getBytes());
+                exchange.sendResponseHeaders(405, 0);
+                exchange.getResponseBody().write("Данный метод не реализован.".getBytes());
                 exchange.close();
             }
         } catch (Exception e) {
-            sendError(exchange, e.getMessage());
+            sendResponse(exchange, e.getMessage(), 500);
         }
     }
 
@@ -86,47 +93,51 @@ public class EpicHandler extends BaseHttpHandler {
         JsonElement jsonElement = JsonParser.parseString(body);
         Epic newTask;
 
-        if (pathParts.length == 3) {
+        if (pathParts.length == 3 && pathParts[1].equals("epics")) {
             int id = Integer.parseInt(pathParts[2]);
-            if (id > 0) {
-                if (isId(id)) {
-                    if (!jsonElement.isJsonObject()) {
-                        sendHasData(exchange, "Запрос не в формае json");
-                    } else {
-                        if (task.getStartTime() != null && taskManager.isCheckTaskTime(task)) {
-                            sendHasInteractions(exchange, "Задачи пересекаются");
-                        } else if (task.getStartTime() != null && !taskManager.isCheckTaskTime(task)) {
-                            newTask = new Epic(id, task.getName(), task.getDescription(), task.getStateTask(),
-                                    task.getStartTime(), task.getDuration());
-                            taskManager.updateEpic(newTask);
-                            sendTextPost(exchange, gson.toJson(newTask));
+            if (isInteger(pathParts[2])) {
+                if (id > 0) {
+                    if (isId(id)) {
+                        if (!jsonElement.isJsonObject()) {
+                            sendResponse(exchange, "Запрос не в формае json", 400);
                         } else {
-                            newTask = new Epic(id, task.getName(), task.getDescription(), task.getStateTask());
-                            taskManager.updateEpic(newTask);
-                            sendTextPost(exchange, gson.toJson(newTask));
+                            if (task.getStartTime() != null && taskManager.isCheckTaskTime(task)) {
+                                sendResponse(exchange, "Задачи пересекаются", 406);
+                            } else if (task.getStartTime() != null && !taskManager.isCheckTaskTime(task)) {
+                                newTask = new Epic(id, task.getName(), task.getDescription(), task.getStateTask(),
+                                        task.getStartTime(), task.getDuration());
+                                taskManager.updateEpic(newTask);
+                                sendResponse(exchange, gson.toJson(newTask), 201);
+                            } else {
+                                newTask = new Epic(id, task.getName(), task.getDescription(), task.getStateTask());
+                                taskManager.updateEpic(newTask);
+                                sendResponse(exchange, gson.toJson(newTask), 201);
+                            }
                         }
+                    } else {
+                        sendResponse(exchange, "Такой задачи неусещствует1 id = " + id, 404);
                     }
                 } else {
-                    sendNotFoundId(exchange, "Такой задачи неусещствует1 id = " + id);
+                    sendResponse(exchange, "id не может быть не числом и не может быть меньше 0.", 400);
                 }
             } else {
-                sendHasData(exchange, "id не может быть не числом и не может быть меньше 0.");
+                sendResponse(exchange, "id должен быть числом", 405);
             }
-        } else if (pathParts.length == 2) {
+        } else if (pathParts.length == 2 && pathParts[1].equals("epics")) {
             if (task.getStartTime() != null && taskManager.isCheckTaskTime(task)) {
-                sendHasInteractions(exchange, "Задачи пересекаются");
+                sendResponse(exchange, "Задачи пересекаются", 406);
             } else if (task.getStartTime() != null && !taskManager.isCheckTaskTime(task)) {
                 newTask = new Epic(task.getName(), task.getDescription(), task.getStartTime(), task.getDuration());
                 taskManager.addEpic(newTask);
-                sendTextPost(exchange, gson.toJson(newTask));
+                sendResponse(exchange, gson.toJson(newTask), 201);
             } else {
                 newTask = new Epic(task.getName(), task.getDescription());
                 taskManager.addEpic(newTask);
-                sendTextPost(exchange, gson.toJson(newTask));
+                sendResponse(exchange, gson.toJson(newTask), 201);
             }
         } else {
-            exchange.sendResponseHeaders(500, 0);
-            exchange.getResponseBody().write("Неизвестная ошибка".getBytes());
+            exchange.sendResponseHeaders(405, 0);
+            exchange.getResponseBody().write("Данный метод не реализован.".getBytes());
             exchange.close();
         }
     }
@@ -138,28 +149,32 @@ public class EpicHandler extends BaseHttpHandler {
             String path = exchange.getRequestURI().getPath();
             String[] pathParts = path.split("/");
 
-            if (pathParts.length == 2) {
+            if (pathParts.length == 2 && pathParts[1].equals("epics")) {
                 taskManager.deleteAllEpics();
-                sendTextDelete(exchange, "Список задач очищен.");
-            } else if (pathParts.length == 3) {
+                sendResponse(exchange, "Список задач очищен.", 204);
+            } else if (pathParts.length == 3 && pathParts[1].equals("epics")) {
                 int id = Integer.parseInt(pathParts[2]);
-                if (id > 0) {
-                    if (isId(id)) {
-                        taskManager.deleteEpic(id);
-                        sendTextDelete(exchange, "Задача id = " + id + " удалена.");
+                if (isInteger(pathParts[2])) {
+                    if (id > 0) {
+                        if (isId(id)) {
+                            taskManager.deleteEpic(id);
+                            sendResponse(exchange, "Задача id = " + id + " удалена.", 204);
+                        } else {
+                            sendResponse(exchange, "Такой задачи нет id = " + id, 404);
+                        }
                     } else {
-                        sendNotFoundId(exchange, "Такой задачи нет id = " + id);
+                        sendResponse(exchange, "id не может быть не числом и не может быть меньше 0.", 400);
                     }
                 } else {
-                    sendHasData(exchange, "id не может быть не числом и не может быть меньше 0.");
+                    sendResponse(exchange, "id должен быть числом", 405);
                 }
             } else {
-                exchange.sendResponseHeaders(500, 0);
-                exchange.getResponseBody().write("Неизвестная ошибка".getBytes());
+                exchange.sendResponseHeaders(405, 0);
+                exchange.getResponseBody().write("Такого метода не существует.".getBytes());
                 exchange.close();
             }
         } catch (Exception e) {
-            sendError(exchange, e.getMessage());
+            sendResponse(exchange, e.getMessage(), 500);
         }
     }
 }

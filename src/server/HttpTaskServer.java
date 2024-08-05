@@ -14,8 +14,8 @@ import task.manager.service.*;
 
 public class HttpTaskServer {
     private static final int PORT = 8080;
-    private static HttpServer httpServer;
-    private static final TaskManager taskManager = Managers.getDefault();
+    private HttpServer httpServer;
+    private final TaskManager taskManager = Managers.getDefault();
 
     public HttpTaskServer(TaskManager taskManager) throws IOException {
         httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
@@ -26,12 +26,12 @@ public class HttpTaskServer {
         httpServer.createContext("/prioritized", new PrioritizedHandler(taskManager));
     }
 
-    public static void start() {
+    public void start() {
         httpServer.start();
         System.out.println("Сервер запущен на " + PORT + " порту.");
     }
 
-    public static void stop(int delay) {
+    public void stop(int delay) {
         httpServer.stop(delay);
         System.out.println("Сервер остановлен.");
     }
@@ -49,7 +49,7 @@ public class HttpTaskServer {
 
     public static void main(String[] args) throws IOException {
         HttpTaskServer httpTaskServer = new HttpTaskServer(Managers.getDefault());
-        HttpTaskServer.start();
+        httpTaskServer.start();
         //HttpTaskServer.stop(0);
     }
 }

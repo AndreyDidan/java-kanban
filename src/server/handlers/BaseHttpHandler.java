@@ -3,20 +3,21 @@ package server.handlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import exception.ManagerSaveException;
+import exception.NotFoundException;
 import exception.ValidationException;
 import task.manager.service.TaskManager;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class BaseHttpHandler implements HttpHandler {
+public abstract class BaseHttpHandler implements HttpHandler {
 
-    TaskManager taskManager;
+    protected final TaskManager taskManager;
 
     public BaseHttpHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
     }
 
-    protected boolean isEndpoint(String str) {
+    protected boolean isEndpointGET(String str) {
         return switch (str) {
             case "tasks", "subtasks", "epics", "history", "prioritized" -> true;
             default -> false;
@@ -45,213 +46,52 @@ public class BaseHttpHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
-        try (exchange) {
-            String method = exchange.getRequestMethod();
-            String path = exchange.getRequestURI().getPath();
-            String[] pathParts = path.split("/");
-            int length = pathParts.length;
+        String method = exchange.getRequestMethod();
+        String path = exchange.getRequestURI().getPath();
+        String[] pathParts = path.split("/");
 
-            try (exchange) {
-                try {
-                    if (isEndpoint(pathParts[1])) {
-                        switch (method) {
-                            case "GET" -> {
-                                if (length == 2 && isEndpoint(pathParts[1])) {
-                                    handleGetRequest(exchange);
-                                } else if (length == 3 && isEndpointTask(pathParts[1])) {
-                                    if (isInteger(pathParts[2])) {
-                                        handleGetRequest(exchange);
-                                    } else {
-                                        sendHasData(exchange, "id должен быть числом");
-                                    }
-                                } else if (length == 4 && pathParts[1].equals("epics") && pathParts[3].equals("subtasks")) {
-                                    if (isInteger(pathParts[2])) {
-                                        handleGetRequest(exchange);
-                                    } else {
-                                        sendHasData(exchange, "id должен быть числом");
-                                    }
-                                } else {
-                                    sendNotFoundEndpoint(exchange, "Данный метод не реализован, используйте " +
-                                            "методы указанные в задании");
-                                }
-                            }
-                            case "POST" -> {
-                                if (length == 2 && isEndpointTask(pathParts[1])) {
-                                    if (isEndpointTask(pathParts[1])) {
-                                        handlePostRequest(exchange);
-                                    } else {
-                                        sendNotFoundEndpoint(exchange, "Данный эндпоинт не реализован, используйте " +
-                                                "эндпоинты указанные в задании");
-                                    }
-                                } else if (length == 3 && isEndpointTask(pathParts[1])) {
-                                    if (isEndpointTask(pathParts[1])) {
-                                        if (isInteger(pathParts[2])) {
-                                            handlePostRequest(exchange);
-                                        } else {
-                                            sendHasData(exchange, "id должен быть числом");
-                                        }
-                                    } else {
-                                        sendNotFoundEndpoint(exchange, "Данный эндпоинт не реализован, используйте " +
-                                                "эндпоинты указанные в задании");
-                                    }
-                                } else {
-                                    sendNotFoundEndpoint(exchange, "Данный эндпоинт не реализован, используйте " +
-                                            "эндпоинты указанные в задании");
-                                }
-                            }
-                            case "DELETE" -> {
-                                if (length == 2) {
-                                    if (isEndpointTask(pathParts[1])) {
-                                        handleDeleteRequest(exchange);
-                                    } else {
-                                        sendNotFoundEndpoint(exchange, "Данный эндпоинт не реализован, используйте " +
-                                                "эндпоинты указанные в задании");
-                                    }
-                                } else if (length == 3) {
-                                    if (isEndpointTask(pathParts[1])) {
-                                        if (isInteger(pathParts[2])) {
-                                            handleDeleteRequest(exchange);
-                                        } else {
-                                            sendHasData(exchange, "id должен быть числом");
-                                        }
-                                    } else {
-                                        sendNotFoundEndpoint(exchange, "Данный эндпоинт не реализован, используйте " +
-                                                "эндпоинты указанные в задании");
-                                    }
-                                } else {
-                                    sendNotFoundEndpoint(exchange, "Данный меод не реализован, " +
-                                            "используйте методы указанные в задании");
-                                }
-                            }
-                            default -> {
-                                sendNotFoundEndpoint(exchange, "Данный эндпоинт не реализован, " +
-                                        "используйте эндпоинты указанные в задании");
-                            }
-                        }
-                    } else {
-                        sendNotFoundEndpoint(exchange, "Данный эндпоинт не реализован, используйте эндпоинт указанные " +
-                                "в задании");
+        try {
+            switch (method) {
+                case "GET":
+                    if (isEndpointGET(pathParts[1])) {
+                        handleGetRequest(exchange);
+                        break;
                     }
-                } catch (ManagerSaveException e) {
-                    sendHasData(exchange, e.getMessage());
-                } catch (ValidationException e) {
-                    sendHasInteractions(exchange, e.getMessage());
-                }
-
-            } catch (Exception e) {
-                sendError(exchange, e.getMessage());
+                case "POST":
+                    if (isEndpointTask(pathParts[1])) {
+                        handlePostRequest(exchange);
+                        break;
+                    }
+                case "DELETE":
+                    if (isEndpointTask(pathParts[1])) {
+                        handleDeleteRequest(exchange);
+                        break;
+                    }
+                default:
+                    sendResponse(exchange, "Данный метод не реализован.", 405);
             }
+        } catch (ManagerSaveException e) {
+            sendResponse(exchange, e.getMessage(), 400);
+        } catch (ValidationException e) {
+            sendResponse(exchange, e.getMessage(), 406);
+        } catch (NotFoundException e) {
+            sendResponse(exchange, e.getMessage(), 404);
         } catch (Exception e) {
-            sendError(exchange, e.getMessage());
+            sendResponse(exchange, e.getMessage(), 500);
         }
     }
 
-    protected void handleGetRequest(HttpExchange httpExchange) throws IOException {
+    protected abstract void handleGetRequest(HttpExchange httpExchange) throws IOException;
 
-    }
+    protected abstract void handlePostRequest(HttpExchange httpExchange) throws IOException;
 
-    protected void handlePostRequest(HttpExchange httpExchange) throws IOException {
+    protected abstract void handleDeleteRequest(HttpExchange httpExchange) throws IOException;
 
-    }
-
-    protected void handleDeleteRequest(HttpExchange httpExchange) throws IOException {
-
-    }
-
-    protected void sendText(HttpExchange exchange, String text) throws IOException {
-        try (exchange) {
-            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-            exchange.sendResponseHeaders(200, resp.length);
-            exchange.getResponseBody().write(resp);
-        } catch (Exception e) {
-            sendError(exchange, e.getMessage());
-            exchange.close();
-        }
-    }
-
-    protected void sendTextPost(HttpExchange exchange, String text) throws IOException {
-        try (exchange) {
-            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-            exchange.sendResponseHeaders(201, resp.length);
-            exchange.getResponseBody().write(resp);
-        } catch (Exception e) {
-            sendError(exchange, e.getMessage());
-            exchange.close();
-        }
-    }
-
-    protected void sendTextDelete(HttpExchange exchange, String text) throws IOException {
-        try (exchange) {
-            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-            exchange.sendResponseHeaders(204, resp.length);
-            exchange.getResponseBody().write(resp);
-        } catch (Exception e) {
-            sendError(exchange, e.getMessage());
-            exchange.close();
-        }
-    }
-
-    protected void sendHasData(HttpExchange exchange, String text) throws IOException {
-
-        try (exchange) {
-            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-            exchange.sendResponseHeaders(400, resp.length);
-            exchange.getResponseBody().write(resp);
-        } catch (Exception e) {
-            sendError(exchange, e.getMessage());
-            exchange.close();
-        }
-    }
-
-    protected void sendNotFoundId(HttpExchange exchange, String text) throws IOException {
-        try (exchange) {
-            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-            exchange.sendResponseHeaders(404, resp.length);
-            exchange.getResponseBody().write(resp);
-        }  catch (Exception e) {
-            sendError(exchange, e.getMessage());
-            exchange.close();
-        }
-    }
-
-    protected void sendNotFoundEndpoint(HttpExchange exchange, String text) throws IOException {
-        try (exchange) {
-            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-            exchange.sendResponseHeaders(405, resp.length);
-            exchange.getResponseBody().write(resp);
-        } catch (Exception e) {
-            sendError(exchange, e.getMessage());
-            exchange.close();
-        }
-    }
-
-    protected void sendHasInteractions(HttpExchange exchange, String text) throws IOException {
-        try (exchange) {
-            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-            exchange.sendResponseHeaders(406, resp.length);
-            exchange.getResponseBody().write(resp);
-        } catch (Exception e) {
-            sendError(exchange, e.getMessage());
-            exchange.close();
-        }
-    }
-
-    protected void sendError(HttpExchange exchange, String text) throws IOException {
-        try (exchange) {
-            byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-            exchange.sendResponseHeaders(500, resp.length);
-            exchange.getResponseBody().write(resp);
-        } catch (Exception e) {
-            sendError(exchange, e.getMessage());
-            exchange.close();
-        }
+    protected void sendResponse(HttpExchange exchange, String text, int codeResponse) throws IOException {
+        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+        exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+        exchange.sendResponseHeaders(codeResponse, resp.length);
+        exchange.getResponseBody().write(resp);
+        exchange.close();
     }
 }

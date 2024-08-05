@@ -18,7 +18,7 @@ import com.google.gson.GsonBuilder;
 
 public class SubTaskHandler extends BaseHttpHandler {
 
-    Gson gson;
+    private final Gson gson;
 
     public SubTaskHandler(TaskManager taskManager) {
         super(taskManager);
@@ -49,23 +49,27 @@ public class SubTaskHandler extends BaseHttpHandler {
             String path = exchange.getRequestURI().getPath();
             String[] pathParts = path.split("/");
 
-            if (pathParts.length == 2) {
-                sendText(exchange, gson.toJson(taskManager.getAllSubtasks()));
-            } else if (pathParts.length == 3) {
+            if (pathParts.length == 2 && pathParts[1].equals("subtasks")) {
+                sendResponse(exchange, gson.toJson(taskManager.getAllSubtasks()), 200);
+            } else if (pathParts.length == 3 && pathParts[1].equals("subtasks")) {
                 int id = Integer.parseInt(pathParts[2]);
-                if (isId(id)) {
-                    SubTask task = taskManager.getSubTaskId(id);
-                    sendText(exchange, gson.toJson(task));
+                if (isInteger(pathParts[2])) {
+                    if (isId(id)) {
+                        SubTask task = taskManager.getSubTaskId(id);
+                        sendResponse(exchange, gson.toJson(task), 200);
+                    } else {
+                        sendResponse(exchange, "Такой задачи неусещствует id = " + id, 404);
+                    }
                 } else {
-                    sendNotFoundId(exchange, "Такой задачи неусещствует id = " + id);
+                    sendResponse(exchange, "id должен быть числом", 405);
                 }
             } else {
-                exchange.sendResponseHeaders(500, 0);
-                exchange.getResponseBody().write("Неизвестная ошибка".getBytes());
+                exchange.sendResponseHeaders(405, 0);
+                exchange.getResponseBody().write("Данный метод не реализован.".getBytes());
                 exchange.close();
             }
         } catch (Exception e) {
-            sendError(exchange, e.getMessage());
+            sendResponse(exchange, e.getMessage(), 500);
         }
     }
 
@@ -80,51 +84,53 @@ public class SubTaskHandler extends BaseHttpHandler {
         JsonElement jsonElement = JsonParser.parseString(body);
         SubTask newTask;
 
-        if (pathParts.length == 3) {
+        if (pathParts.length == 3 && pathParts[1].equals("subtasks")) {
             int id = Integer.parseInt(pathParts[2]);
-            if (id > 0) {
-                if (isId(id)) {
-                    if (!jsonElement.isJsonObject()) {
-                        sendHasData(exchange, "Запрос не в формае json");
-                    } else {
-                        if (task.getStartTime() != null && taskManager.isCheckTaskTime(task)) {
-                            sendHasInteractions(exchange, "Задачи пересекаются");
-                        } else if (task.getStartTime() != null && !taskManager.isCheckTaskTime(task)) {
-                            newTask = new SubTask(task.getName(), task.getDescription(), task.getStateTask(),
-                                    task.getIdEpic(), id, task.getStartTime(), task.getDuration());
-                            taskManager.updateSubTask(newTask);
-                            sendTextPost(exchange, gson.toJson(newTask));
+            if (isInteger(pathParts[2])) {
+                if (id > 0) {
+                    if (isId(id)) {
+                        if (!jsonElement.isJsonObject()) {
+                            sendResponse(exchange, "Запрос не в формае json", 400);
                         } else {
-                            newTask = new SubTask(task.getName(), task.getDescription(), task.getStateTask(),
-                                    task.getIdEpic(), id);
-                            taskManager.updateSubTask(newTask);
-                            sendTextPost(exchange, gson.toJson(newTask));
+                            if (task.getStartTime() != null && taskManager.isCheckTaskTime(task)) {
+                                sendResponse(exchange, "Задачи пересекаются", 406);
+                            } else if (task.getStartTime() != null && !taskManager.isCheckTaskTime(task)) {
+                                newTask = new SubTask(task.getName(), task.getDescription(), task.getStateTask(),
+                                        task.getIdEpic(), id, task.getStartTime(), task.getDuration());
+                                taskManager.updateSubTask(newTask);
+                                sendResponse(exchange, gson.toJson(newTask), 201);
+                            } else {
+                                newTask = new SubTask(task.getName(), task.getDescription(), task.getStateTask(),
+                                        task.getIdEpic(), id);
+                                taskManager.updateSubTask(newTask);
+                                sendResponse(exchange, gson.toJson(newTask), 201);
+                            }
                         }
+                    } else {
+                        sendResponse(exchange, "Такой задачи неусещствует id = " + id, 404);
                     }
-
-
                 } else {
-                    sendNotFoundId(exchange, "Такой задачи неусещствует id = " + id);
+                    sendResponse(exchange, "id не может быть не числом и не может быть меньше 0.", 400);
                 }
             } else {
-                sendHasData(exchange, "id не может быть не числом и не может быть меньше 0.");
+                sendResponse(exchange, "id должен быть числом", 405);
             }
-        } else if (pathParts.length == 2) {
+        } else if (pathParts.length == 2 && pathParts[1].equals("subtasks")) {
             if (task.getStartTime() != null && taskManager.isCheckTaskTime(task)) {
-                sendHasInteractions(exchange, "Задачи пересекаются");
+                sendResponse(exchange, "Задачи пересекаются", 406);
             } else if (task.getStartTime() != null && !taskManager.isCheckTaskTime(task)) {
                 newTask = new SubTask(task.getName(), task.getDescription(), task.getIdEpic(), task.getStartTime(),
                         task.getDuration());
                 taskManager.addSubTask(newTask);
-                sendTextPost(exchange, gson.toJson(newTask));
+                sendResponse(exchange, gson.toJson(newTask), 201);
             } else {
                 newTask = new SubTask(task.getName(), task.getDescription(), task.getIdEpic());
                 taskManager.addSubTask(newTask);
-                sendTextPost(exchange, gson.toJson(newTask));
+                sendResponse(exchange, gson.toJson(newTask), 201);
             }
         } else {
-            exchange.sendResponseHeaders(500, 0);
-            exchange.getResponseBody().write("Internal Server Error".getBytes());
+            exchange.sendResponseHeaders(405, 0);
+            exchange.getResponseBody().write("Данный метод не реализован.".getBytes());
             exchange.close();
         }
     }
@@ -136,28 +142,32 @@ public class SubTaskHandler extends BaseHttpHandler {
             String path = exchange.getRequestURI().getPath();
             String[] pathParts = path.split("/");
 
-            if (pathParts.length == 3) {
+            if (pathParts.length == 3 && pathParts[1].equals("subtasks")) {
                 int id = Integer.parseInt(pathParts[2]);
-                if (id > 0) {
-                    if (isId(id)) {
-                        taskManager.deleteSubTask(id);
-                        sendTextDelete(exchange, "Подзадача id = " + id + " удалена.");
+                if (isInteger(pathParts[2])) {
+                    if (id > 0) {
+                        if (isId(id)) {
+                            taskManager.deleteSubTask(id);
+                            sendResponse(exchange, "Подзадача id = " + id + " удалена.", 204);
+                        } else {
+                            sendResponse(exchange, "Такой подзадачи неусещствует id = " + id, 404);
+                        }
                     } else {
-                        sendNotFoundId(exchange, "Такой подзадачи неусещствует id = " + id);
+                        sendResponse(exchange, "id не может быть не числом и не может быть меньше 0.", 400);
                     }
                 } else {
-                    sendHasData(exchange, "id не может быть не числом и не может быть меньше 0.");
+                    sendResponse(exchange, "id должен быть числом", 405);
                 }
-            } else if (pathParts.length == 2) {
+            } else if (pathParts.length == 2 && pathParts[1].equals("subtasks")) {
                 taskManager.deleteAllSubTask();
-                sendTextDelete(exchange, "Подзадачи удалены.");
+                sendResponse(exchange, "Подзадачи удалены.", 204);
             } else {
-                exchange.sendResponseHeaders(500, 0);
-                exchange.getResponseBody().write("Неизвестная ошибка".getBytes());
+                exchange.sendResponseHeaders(405, 0);
+                exchange.getResponseBody().write("Данный метод не реализован.".getBytes());
                 exchange.close();
             }
         } catch (Exception e) {
-            sendError(exchange, e.getMessage());
+            sendResponse(exchange, e.getMessage(), 500);
         }
     }
 }
