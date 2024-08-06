@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -692,8 +693,10 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         taskManager.deleteSubTask(2);
         SubTask actual = taskManager.getSubTaskId(2);
+        ArrayList<SubTask> size = taskManager.getAllSubtasks();
 
-        Assertions.assertNotEquals(expected, actual);
+        Assertions.assertEquals(expected, actual);
+        assertEquals(1, size.size());
     }
 
     @Test

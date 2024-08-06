@@ -150,6 +150,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (epics.containsKey(updateEpic.getId())) {
             epics.get(updateEpic.getId()).setName(updateEpic.getName());
             epics.get(updateEpic.getId()).setDescription(updateEpic.getDescription());
+        } else {
+            throw new NotFoundException("Эпик не найден, Epic id= " + updateEpic.getId());
         }
     }
 
@@ -191,7 +193,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     // проверка на пересечение времени задач
-    private boolean isCheckTaskTime(Task newTask) {
+    public boolean isCheckTaskTime(Task newTask) {
         LocalDateTime newStartInstant = newTask.getStartTime();
         LocalDateTime newEndInstant = newTask.getEndTime();
         boolean tasksCollide =  prioritizedTasks.stream()
@@ -210,21 +212,27 @@ public class InMemoryTaskManager implements TaskManager {
     //Удаление по идентификатору
     @Override
     public void deleteTask(int id) {
-        prioritizedTasks.remove(tasks.get(id));
-        tasks.remove(id);
-        historyManager.remove(id);
+        if (tasks.containsKey(id)) {
+            prioritizedTasks.remove(tasks.get(id));
+            tasks.remove(id);
+            historyManager.remove(id);
+        } else {
+            throw new NotFoundException("Задача не найдена, удаление невозможно Task id= " + id);
+        }
     }
 
     @Override
     public void deleteSubTask(int id) {
-        prioritizedTasks.remove(subTasks.get(id));
-        if (epics.containsKey(id)) {
+        if (subTasks.containsKey(id)) {
+            prioritizedTasks.remove(subTasks.get(id));
+            Epic epic = epics.get(subTasks.get(id).getIdEpic());
+            epic.deleteSubTask(id);
+            changeEpicState(epics.get(epic.getId()));
+            historyManager.remove(id);
             subTasks.remove(id);
+        } else {
+            throw new NotFoundException("Подзадача не найдена, удаление невозможно SubTask id= " + id);
         }
-        Epic epic = epics.get(subTasks.get(id).getIdEpic());
-        epic.deleteSubTask(id);
-        changeEpicState(epics.get(epic.getId()));
-        historyManager.remove(id);
     }
 
     @Override
@@ -237,6 +245,8 @@ public class InMemoryTaskManager implements TaskManager {
             }
             epics.remove(id);
             historyManager.remove(id);
+        } else {
+            throw new NotFoundException("Эпик не найден, удаление невозможно Epic id= " + id);
         }
     }
 

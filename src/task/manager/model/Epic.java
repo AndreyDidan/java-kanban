@@ -13,8 +13,18 @@ public class Epic extends Task {
         super(name, description);
     }
 
+    public Epic(int id, String name, String description, StateTask stateTask) {
+        super(id, name, description, stateTask);
+    }
+
     public Epic(String name, String description, LocalDateTime startTime, Duration duration) {
         super(name, description, startTime, duration);
+        this.setStartTime(startTime);
+        this.setDuration(duration);
+    }
+
+    public Epic(int id, String name, String description, StateTask stateTask, LocalDateTime startTime, Duration duration) {
+        super(id, name, description, stateTask, startTime, duration);
         this.setStartTime(startTime);
         this.setDuration(duration);
     }
